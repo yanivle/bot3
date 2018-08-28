@@ -1,0 +1,40 @@
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+PURPOSE=BOOK_RESERVATION
+TIME=7pm
+DATE=tomorrow
+PARTY_SIZE=5
+---
+For tomorrow
+DATE=tomorrow
+---
+So am I all set?
+*CONFIRM
+---
+How long would the wait be?
+*ESTIMATED_WAIT
+---
+For 7pm please
+TIME=7pm
+---
+I need a table for 5 people
+PARTY_SIZE=5
+---
+The first name is Yaniv
+FIRST_NAME=Yaniv
+---
+The last name is Leviathan
+LAST_NAME=Leviathan
+---
+The phone number is 2125655611
+PHONE_NUMBER=2125655611
+---
+What's the wait please?
+*ESTIMATED_WAIT
+---
+Hmm
+---
+I'm Google's automated booking service
+BOT_IDENTITY=Google Assistant
+---
+It's for dinner
+MEAL=dinner

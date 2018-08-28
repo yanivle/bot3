@@ -1,0 +1,92 @@
+Ok for 6 people, for what time?
+PARTY_SIZE=6
+*TIME
+---
+Ok
+---
+Can you repeat the day please?
+*DATE
+---
+We unfortunately don't take reservations
+RESERVATIONS_ACCEPTED=False
+---
+# Need to repeat this for all party sizes...
+We don't take reservations for parties less than 5
+RESERVATIONS_ACCEPTED[PARTY_SIZE=1]=False
+RESERVATIONS_ACCEPTED[PARTY_SIZE=2]=False
+RESERVATIONS_ACCEPTED[PARTY_SIZE=3]=False
+RESERVATIONS_ACCEPTED[PARTY_SIZE=4]=False
+RESERVATIONS_ACCEPTED[PARTY_SIZE=5]=True
+RESERVATIONS_ACCEPTED[PARTY_SIZE=6]=True
+RESERVATIONS_ACCEPTED[PARTY_SIZE=7]=True
+RESERVATIONS_ACCEPTED[PARTY_SIZE=8]=True
+RESERVATIONS_ACCEPTED[PARTY_SIZE=9]=True
+RESERVATIONS_ACCEPTED[PARTY_SIZE=10]=True
+---
+# Need to repeat this for other times, or abstract to a variable
+I have availability for 5pm
+AVAILABILITY[5pm]=True
+---
+I have availability for 6pm
+AVAILABILITY[6pm]=True
+---
+What's the first name?
+*FIRST_NAME
+---
+What's the last name?
+*LAST_NAME
+---
+Can I have the phone number please?
+*PHONE_NUMBER
+---
+You are all set
+CONFIRM=True
+---
+You are all set for 5pm
+TIME=5pm
+CONFIRM=True
+---
+You are all set for tomorrow at 5pm
+DATE=tomorrow
+TIME=5pm
+CONFIRM=True
+---
+Tomorrow? It should be a very short wait
+DATE=tomorrow
+ESTIMATED_WAIT=short
+---
+It should be a very short wait
+ESTIMATED_WAIT=short
+---
+It should be a very long wait
+ESTIMATED_WAIT=long
+---
+Can I please get the first and the last name?
+*FIRST_NAME
+*LAST_NAME
+---
+Hello
+---
+How can I help?
+*PURPOSE
+---
+We have valet parking
+PARKING_INFO.VALET=True
+---
+I can do 8pm
+TIME=8pm
+---
+Who are you?
+*BOT_IDENTITY
+---
+Ok for 6pm
+TIME=6pm
+---
+Ok for lunch
+MEAL=lunch
+---
+Ok for dinner
+MEAL=dinner
+---
+Is it for lunch or dinner?
+*MEAL

@@ -1,0 +1,96 @@
+rename intents --> utts
+
+Document syntax:
+Statement: VAR=value
+Express interest: *VAR
+Comment: #
+Separator: ---
+
+Add printing of all variables (genVariable(filename))
+Add printing of all values (genValues(filename))
+Add priority between variables: (multiplier? or addition?)
+  example:
+  FIRST_NAME > LAST_NAME > CONFIRM
+  means that, all else equal, we would prioritize diffs for FIRST_NAME and only then CONFIRM
+
+Add priority between goals: (multiplier? or addition?)
+  RESERVATION_MADE > NO_RESERVATIONS
+
+demotion for all intents already used
+  keep set of all used intents and add demotion score for used ones
+
+Can repeat the same intent several times, example:
+Yes
+@positive
+Yes
+@positive
+
+think about conditions:
+  e.g. min reservation size 5
+
+add prepositions to state
+  positive_prep
+  negative_prep
+
+  ?VAR=value 0.4
+  examples:
+  Did you say 4pm?
+  TIME=4pm 0.3
+  ?TIME=4pm +0.3
+  !TIME=?
+  *TIME
+  these are part of the state
+  @positive
+  @negative
+
+  Am I all set?
+  ?CONFIRM=True +0.5
+  !CONFIRM=False +0.5
+  *CONFIRM
+
+
+Allow goals to include OR:A=X,B=Y,C=Z
+Also support OR:A=a1,A=a2,A=a3
+And support NOT_WRONG:MEAL=dinner
+
+Add confidence (absolute and relative)
+  think about this - do i really need both?
+  what happens if VAR changes value? keeps same value?
+  how to implement diffs?
+  VAR=value 0.4 # absolute
+  VAR=value +0.4 # relative
+  ProbStatement
+    prob
+    prob_delta = 0
+
+Verifies implemented as interest + statement + preposition
+For 4pm
+TIME=4pm 0.7
+?TIME=4pm +0.7
+---
+Yes
+@positive
+---
+Yes for 4pm
+@positive
+TIME=4pm +0.3
+---
+Are you Google?
+BOT_IDENTITY=Google 0.3
+?BOT_IDENTITY=Google +0.3
+*BOT_IDENTITY
+---
+Did you say for tomorrow for 5pm?
+*DATE
+DATE=tomorrow 0.3
+?DATE=tomorrow +0.3
+*TIME
+TIME=5pm 0.3
+?TIME=5pm +0.3
+
+add support for hold, repeats, sorry --> independent of use case
+
+Allow goals for not_incorrect(x)
+  Do I need this? Maybe happens automatically
+
+Add rendering logic for intents: When human says "you're all set" if we haven't given the name yet, rendering should be different
