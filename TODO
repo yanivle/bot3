@@ -1,5 +1,3 @@
-rename intents --> utts
-
 Document syntax:
 Statement: VAR=value
 Express interest: *VAR
