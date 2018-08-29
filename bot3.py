@@ -8,16 +8,10 @@ import colors
 import diff as diff_module
 from diff import DiffType
 
-robot_utts = utt.parseUttSpec('robot_intents')
-human_utts = utt.parseUttSpec('human_intents')
+robot_utts = utt.parseUttSpec('robot_utts')
+human_utts = utt.parseUttSpec('human_utts')
 
 goals = goal.parseGoalsSpec('goal_spec')
-
-# pprint.pprint(robot_utts)
-# print()
-# pprint.pprint(human_utts)
-# print()
-# pprint.pprint(goals)
 
 initial_state = state.State.fromText('''
 RESERVATIONS_ACCEPTED=True
