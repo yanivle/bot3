@@ -38,6 +38,14 @@ def answersInterest(state, utt):
     return False
 
 
+def distanceToGoalNotWrongs(state, diff_to_goal_not_wrongs, scoring_params):
+    dist = 0
+    for diff in diff_to_goal_not_wrongs.statement_diffs:
+        if diff.type == diff_module.DiffType.CHANGED:
+            dist += 1000 + scoring_params.config.var_spec.priority(diff.statement1.var)
+    return dist
+
+
 def distanceToGoal(state, diff_to_goal, scoring_params):
     dist = 0
     for diff in diff_to_goal.statement_diffs:
@@ -90,18 +98,31 @@ def scoreUtt(state, goal, utt, scoring_params):
     score = Score()
     new_state, diff = applyUttAndDiff(state, utt)
     diff_to_goal = diff_module.diffStates(new_state, goal.state)
+
     distance_to_goal = -distanceToGoal(new_state, diff_to_goal, scoring_params)
     score.addComponent('distance_to_goal', distance_to_goal)
+
+    diff_to_goal_not_wrongs = diff_module.diffStates(new_state, goal.not_wrongs_state)
+    distance_to_goal_not_wrongs = - \
+        distanceToGoalNotWrongs(new_state, diff_to_goal_not_wrongs, scoring_params)
+    score.addComponent('not_wrongs', distance_to_goal_not_wrongs)
+
     redundant_actions = -10 * redundantActions(diff_module.diffStates(utt.state, state))
     score.addComponent('redundant_actions', redundant_actions)
+
     redundant_interests = -2 * redundantInterests(diff_to_goal, utt.state.interests)
     score.addComponent('redundant_interests', redundant_interests)
+
     answers_interest = 200 if answersInterest(state, utt) else 0
     score.addComponent('answers_interest', answers_interest)
+
     repeated_utt_demotion = -scoring_params.config.repeated_utt_demotion * \
         scoring_params.event_log.utts.count(utt)
+
     score.addComponent('repeated_utt_demotion', repeated_utt_demotion)
+
     score.addComponent('goal_priority', goal.priority)
+
     return score
 
 

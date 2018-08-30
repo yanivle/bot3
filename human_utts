@@ -90,3 +90,10 @@ MEAL=dinner
 ---
 Is it for lunch or dinner?
 *MEAL
+---
+You said Jonny?
+FIRST_NAME=Jonny
+---
+John Smith?
+FIRST_NAME=John
+LAST_NAME=Smith

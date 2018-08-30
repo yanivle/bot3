@@ -15,7 +15,7 @@ class Goal(object):
     @staticmethod
     def fromText(txt_block):
         lines = txt_block.split('\n')
-        r = parse.parse("{name} PRIORITY={priority}", lines[0])
+        r = parse.parse("{name} PRIORITY={priority}", lines.pop(0))
         name = r['name']
         priority = float(r['priority'])
 

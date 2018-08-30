@@ -1,6 +1,5 @@
 Allow inherited goals
 
-And support NOT_WRONG:MEAL=dinner
 Allow goals to include OR:A=X,B=Y,C=Z
 Also support OR:A=a1,A=a2,A=a3
 
