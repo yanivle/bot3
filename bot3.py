@@ -13,11 +13,6 @@ robot_utts = utt.parseUttSpec('robot_utts')
 human_utts = utt.parseUttSpec('human_utts')
 goals = goal.parseGoalsSpec('goal_spec')
 
-vs = var_spec.VarSpec({})
-vs.load('var_spec')
-vs.extendFromStateContainers(robot_utts + human_utts + goals)
-vs.save('var_spec')
-
 initial_state = state_module.State.fromText('''
 RESERVATIONS_ACCEPTED=True
 ''')
@@ -30,6 +25,10 @@ def getHumanUtt():
     return human_utts[idx]
 
 
+var_spec = var_spec.VarSpec.fromFileAndUpdate('var_spec', robot_utts + human_utts + goals)
+config = response_logic.Config(var_spec)
+
+
 def interactiveMode(state):
     while True:
         human_utt = getHumanUtt()
@@ -37,7 +36,7 @@ def interactiveMode(state):
         print(colors.C(human_utt.text, colors.OKBLUE))
         pprint.pprint(diff)
 
-        goal, utt, score = response_logic.bestReplyForAllGoals(state, goals, robot_utts)
+        goal, utt, score = response_logic.bestReplyForAllGoals(state, goals, robot_utts, config)
         print(f'Advancing towards {colors.C(goal.name, colors.HEADER)} (score={score})')
         state, diff = response_logic.applyUttAndDiff(state, utt)
         print(colors.C(f'{utt.text}', colors.OKGREEN))

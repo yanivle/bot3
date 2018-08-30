@@ -1,10 +1,3 @@
-Add printing of all variables (genVariable(filename))
-Add printing of all values (genValues(filename))
-Add priority between variables: (multiplier? or addition?)
-  example:
-  FIRST_NAME > LAST_NAME > CONFIRM
-  means that, all else equal, we would prioritize diffs for FIRST_NAME and only then CONFIRM
-
 Add priority between goals: (multiplier? or addition?)
   RESERVATION_MADE > NO_RESERVATIONS
 
@@ -87,6 +80,7 @@ Allow goals for not_incorrect(x)
 
 Add rendering logic for intents: When human says "you're all set" if we haven't given the name yet, rendering should be different
 
+Add printing of all values (genValues(filename))
 
 
 Document syntax:

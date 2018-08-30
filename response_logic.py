@@ -1,5 +1,7 @@
+from dataclasses import dataclass, field
 import colors
 import diff as diff_module
+from var_spec import VarSpec
 
 VERBOSE = False
 
@@ -35,15 +37,18 @@ def answersInterest(state, utt):
     return False
 
 
-def distanceToGoal(state, diff_to_goal):
+def distanceToGoal(state, diff_to_goal, config):
     dist = 0
     for diff in diff_to_goal.statement_diffs:
         if diff.type == diff_module.DiffType.CHANGED:
-            dist += 1000
+            # Variable messed up from goal
+            dist += 1000 + config.var_spec.priority(diff.statement1.var)
         elif diff.type == diff_module.DiffType.ADDED:
+            # Variable in goal but not set now
             if not state.gets(diff.statement2.var):
-                dist += 100
+                dist += 100 + config.var_spec.priority(diff.statement2.var)
         elif diff.type == diff_module.DiffType.REMOVED:
+            # Variable exists here but not in goal
             dist += 10
     return dist
 
@@ -63,11 +68,11 @@ def redundantInterests(diff, interests):
     return res
 
 
-def scoreUtt(state, goal, utt):
+def scoreUtt(state, goal, utt, config):
     score = 0
     new_state, diff = applyUttAndDiff(state, utt)
     diff_to_goal = diff_module.diffStates(new_state, goal.state)
-    distance_to_goal = -distanceToGoal(new_state, diff_to_goal)
+    distance_to_goal = -distanceToGoal(new_state, diff_to_goal, config)
     redundant_actions = -10 * redundantActions(diff_module.diffStates(utt.state, state))
     redundant_interests = -2 * redundantInterests(diff_to_goal, utt.state.interests)
     answers_interest = 200 if answersInterest(state, utt) else 0
@@ -90,24 +95,29 @@ def bfsPaths(start, goal, max_depth=10):
     return res
 
 
-def scoreForGoal(state, goal, utts):
+def scoreForGoal(state, goal, utts, config):
     res = []
     for utt in utts:
-        score, score_components = scoreUtt(state, goal, utt)
+        score, score_components = scoreUtt(state, goal, utt, config)
         res.append([score, score_components, utt])
     return res
 
 
-def scoreForAllGoals(state, goals, utts):
+def scoreForAllGoals(state, goals, utts, config):
     res = []
     for goal in goals:
-        scores_for_goal = scoreForGoal(state, goal, utts)
+        scores_for_goal = scoreForGoal(state, goal, utts, config)
         res += [x + [goal] for x in scores_for_goal]
     return res
 
 
-def bestReplyForAllGoals(state, goals, utts):
-    all_scores = scoreForAllGoals(state, goals, utts)
+@dataclass
+class Config(object):
+    var_spec: VarSpec = None
+
+
+def bestReplyForAllGoals(state, goals, utts, config):
+    all_scores = scoreForAllGoals(state, goals, utts, config)
     srtd = sorted(all_scores, key=lambda x: x[0], reverse=True)
     if VERBOSE:
         for candidate in srtd[:5]:

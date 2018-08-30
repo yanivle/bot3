@@ -21,6 +21,17 @@ def getVarsFromStateContainerList(container_list):
 class VarSpec(object):
     vars: Dict[str, float]
 
+    def priority(self, var):
+        return self.vars.get(var, 0.0)
+
+    @staticmethod
+    def fromFileAndUpdate(filename, container_list):
+        var_spec = VarSpec({})
+        var_spec.load(filename)
+        var_spec.extendFromStateContainers(container_list)
+        var_spec.save(filename)
+        return var_spec
+
     def extendFromStateContainers(self, container_list, default_priority=0.0):
         vars_set = getVarsFromStateContainerList(container_list)
         for var in vars_set:
