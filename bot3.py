@@ -10,9 +10,11 @@ from diff import DiffType
 import var_spec
 import event_log
 
-robot_utts = utt.parseUttSpec('robot_utts')
-human_utts = utt.parseUttSpec('human_utts')
-goal_module.parseGoalsSpec('goal_spec')
+bot_module_base = 'modules/rr'
+# bot_module_base = 'modules/haggler'
+robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
+human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
+goal_module.parseGoalsSpec(bot_module_base + '/goal_spec')
 goals = [goal for goal in goal_module.all_goals.values() if goal.priority > 0]
 
 for goal in goals:

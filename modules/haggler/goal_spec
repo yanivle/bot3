@@ -1,0 +1,14 @@
+# Tl;dr - need probs in order to make this work (I think)
+# Prob distribution changes should be relative
+
+AGREE_ON_7(-) PRIORITY=70
+H_ACCEPT[VAL=7]=True
+---
+AGREE_ON_8(-) PRIORITY=80
+H_ACCEPT[VAL=8]=True
+---
+AGREE_ON_9(-) PRIORITY=90
+H_ACCEPT[VAL=9]=True
+---
+AGREE_ON_10(-) PRIORITY=100
+H_ACCEPT[VAL=10]=True

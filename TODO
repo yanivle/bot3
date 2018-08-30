@@ -1,5 +1,7 @@
 Need to allow choosing side effects in interactive mode instead of fixed utts.
 
+Maybe add Interest probabilities?
+
 Need to prefer utt that advance us towards several goals.
 E.g.:
 R:What time are you available?
