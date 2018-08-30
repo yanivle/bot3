@@ -3,17 +3,22 @@ import pprint
 import utt
 import response_logic
 import goal
-import state
+import state as state_module
 import colors
 import diff as diff_module
 from diff import DiffType
+import var_spec
 
 robot_utts = utt.parseUttSpec('robot_utts')
 human_utts = utt.parseUttSpec('human_utts')
-
 goals = goal.parseGoalsSpec('goal_spec')
 
-initial_state = state.State.fromText('''
+vs = var_spec.VarSpec({})
+vs.load('var_spec')
+vs.extendFromStateContainers(robot_utts + human_utts + goals)
+vs.save('var_spec')
+
+initial_state = state_module.State.fromText('''
 RESERVATIONS_ACCEPTED=True
 ''')
 

@@ -2,7 +2,6 @@ from dataclasses import dataclass, field, replace
 from typing import Dict, List
 from enum import Enum
 import parse
-import powerset
 import pprint
 from statement import Statement, StatementList
 from diff import StateDiff

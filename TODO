@@ -1,9 +1,3 @@
-Document syntax:
-Statement: VAR=value
-Express interest: *VAR
-Comment: #
-Separator: ---
-
 Add printing of all variables (genVariable(filename))
 Add printing of all values (genValues(filename))
 Add priority between variables: (multiplier? or addition?)
@@ -92,3 +86,11 @@ Allow goals for not_incorrect(x)
   Do I need this? Maybe happens automatically
 
 Add rendering logic for intents: When human says "you're all set" if we haven't given the name yet, rendering should be different
+
+
+
+Document syntax:
+Statement: VAR=value
+Express interest: *VAR
+Comment: #
+Separator: ---
