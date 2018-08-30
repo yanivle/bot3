@@ -1,28 +1,25 @@
-from dataclasses import dataclass, field
-from typing import Dict
-from util import flatten
-import parse
 import functools
+import prioritized_keys
 
 
-def getVarsFromState(state):
+def getKeysFromState(state):
     return set(state.statement_list.statements.keys())
 
 
-def getVarsFromStateContainer(container):
-    return getVarsFromState(container.state)
+def getKeysFromStateContainer(container):
+    return getKeysFromState(container.state)
 
 
-def getVarsFromStateContainerList(container_list):
-    return functools.reduce(lambda x, y: x | y, (getVarsFromStateContainer(container) for container in container_list), set())
+def getKeysFromStateContainerList(container_list):
+    return functools.reduce(lambda x, y: x | y, (getKeysFromStateContainer(container) for container in container_list), set())
 
 
-@dataclass
-class VarSpec(object):
-    vars: Dict[str, float]
-
-    def priority(self, var):
-        return self.vars.get(var, 0.0)
+class VarSpec(prioritized_keys.PrioritizedKeys):
+    def extendFromStateContainers(self, container_list, default_priority=0.0):
+        keys_set = getKeysFromStateContainerList(container_list)
+        for key in keys_set:
+            if key not in self.keys:
+                self.keys[key] = default_priority
 
     @staticmethod
     def fromFileAndUpdate(filename, container_list):
@@ -31,24 +28,3 @@ class VarSpec(object):
         var_spec.extendFromStateContainers(container_list)
         var_spec.save(filename)
         return var_spec
-
-    def extendFromStateContainers(self, container_list, default_priority=0.0):
-        vars_set = getVarsFromStateContainerList(container_list)
-        for var in vars_set:
-            if var not in self.vars:
-                self.vars[var] = default_priority
-
-    def save(self, filename):
-        f = open(filename, "w")
-        for var_priority in sorted(self.vars.items(), key=lambda x: (x[1], x[0]), reverse=True):
-            f.write(f"{var_priority[0]}:{var_priority[1]}\n")
-        f.close()
-
-    def load(self, filename):
-        f = open(filename, "r")
-        txt = f.read()
-        lines = txt.split('\n')
-        for line in lines:
-            r = parse.parse("{var}:{priority}", line)
-            if r:
-                self.vars[r['var']] = float(r['priority'])

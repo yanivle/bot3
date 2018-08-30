@@ -76,8 +76,10 @@ def scoreUtt(state, goal, utt, config):
     redundant_actions = -10 * redundantActions(diff_module.diffStates(utt.state, state))
     redundant_interests = -2 * redundantInterests(diff_to_goal, utt.state.interests)
     answers_interest = 200 if answersInterest(state, utt) else 0
-    score = distance_to_goal + redundant_actions + answers_interest + redundant_interests
-    score_components = (distance_to_goal, redundant_actions, answers_interest, redundant_interests)
+    goal_priority = goal.priority
+    score = distance_to_goal + redundant_actions + answers_interest + redundant_interests + goal_priority
+    score_components = (distance_to_goal, redundant_actions,
+                        answers_interest, redundant_interests, goal_priority)
     return score, score_components
 
 

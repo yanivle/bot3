@@ -1,6 +1,3 @@
-Add priority between goals: (multiplier? or addition?)
-  RESERVATION_MADE > NO_RESERVATIONS
-
 demotion for all intents already used
   keep set of all used intents and add demotion score for used ones
 
