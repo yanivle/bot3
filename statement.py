@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field, replace
 from typing import Dict, List
 from enum import Enum
-import parse
 import pprint
 
 
@@ -12,11 +11,10 @@ class Statement(object):
 
     @staticmethod
     def fromText(text):
-        # BUG: need to pick the right most '=' as:
-        # A[X=Y]=B will now split incorrectly into "A[X" and "Y]=B".
-        r = parse.parse("{var}={value}", text)
-        if r:
-            return Statement(r['var'], r['value'])
+        # HACK: this works but ugly parsing...
+        var, eq, value = text.rpartition('=')
+        if eq:
+            return Statement(var, value)
 
     def clone(self):
         return Statement(self.var, self.value)

@@ -21,6 +21,8 @@ for goal in goals:
 
 initial_state = state_module.State.fromText('''
 RESERVATIONS_ACCEPTED=True
+RESERVATIONS_ACCEPTED[PARTY_SIZE=5]=True
+RESERVATIONS_ACCEPTED[TIME=7pm]=True
 ''')
 
 
