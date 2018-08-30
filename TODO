@@ -1,11 +1,9 @@
-Rename State.statement_list to State.statements
-
-Allow inherited goals
-
-Allow goals to include OR:A=X,B=Y,C=Z
-Also support OR:A=a1,A=a2,A=a3
-
-refactor State to AssertionsState, InterestsState, ...
+think about:
+R: For 7pm
+H: I can do 8m
+probably "H: I can do 8m" should be:
+TIME=8pm 0.4
+NO_AVAILABILITY[TIME=7PM]=True 0.4
 
 think about conditions:
   e.g. min reservation size 5
@@ -81,3 +79,7 @@ Statement: VAR=value
 Express interest: *VAR
 Comment: #
 Separator: ---
+
+Rename State.statement_list to State.statements
+
+refactor State to AssertionsState, InterestsState, ...

@@ -4,6 +4,10 @@ TIME=7pm
 DATE=tomorrow
 PARTY_SIZE=5
 ---
+For tomorrow at 7pm
+DATE=tomorrow
+TIME=7pm
+---
 For tomorrow
 DATE=tomorrow
 ---
