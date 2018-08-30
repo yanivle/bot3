@@ -10,8 +10,8 @@ from diff import DiffType
 import var_spec
 import event_log
 
-# bot_module_base = 'modules/rr'
-bot_module_base = 'modules/haggler'
+bot_module_base = 'modules/rr'
+# bot_module_base = 'modules/haggler'
 robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
 human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
 goal_module.parseGoalsSpec(bot_module_base + '/goal_spec')
@@ -21,12 +21,19 @@ for goal in goals:
     print(goal)
     print()
 
-initial_state = state_module.State.fromText('''
-WALKINS_ACCEPTED=False
-RESERVATIONS_ACCEPTED=True
-RESERVATIONS_ACCEPTED[PARTY_SIZE=5]=True
-RESERVATIONS_ACCEPTED[TIME=7pm]=True
-''')
+initial_state = state_module.State.fromFile(bot_module_base + '/initial_state')
+
+
+def getHumanUttFreeform():
+    print('Vars: ' + ', '.join(var_spec.keys.keys()))
+    lines = ['<INTERACTIVE>']
+    line = input('>>> ')
+    while line:
+        lines.append(line)
+        line = input('>>> ')
+    res = utt.Utt.fromText('\n'.join(lines))
+    print(res)
+    return res
 
 
 def getHumanUtt():
@@ -45,7 +52,8 @@ scoring_params = response_logic.ScoringParams(event_log.EventLog([]), config)
 
 def interactiveMode(state):
     while True:
-        human_utt = getHumanUtt()
+        # human_utt = getHumanUtt()
+        human_utt = getHumanUttFreeform()
         scoring_params.event_log.add(human_utt)
         state, diff = response_logic.applyUttAndDiff(state, human_utt)
         print(colors.C(human_utt.text, colors.OKBLUE))

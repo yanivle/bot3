@@ -31,6 +31,12 @@ class State(object):
                 state.statement_list.addStatement(s)
         return state
 
+    @staticmethod
+    def fromFile(filename):
+        f = open(filename)
+        txt = f.read()
+        return State.fromText(txt)
+
     def sets(self, var):
         return var in self.statement_list.statements.keys()
 
