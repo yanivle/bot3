@@ -23,11 +23,12 @@ class State(object):
         for line in text.split('\n'):
             if not line:
                 continue
-            s = Statement.fromText(line)
-            if s:
-                state.statement_list.addStatement(s)
+            i = Interest.fromText(line)
+            if i:
+                state.interests.append(i)
             else:
-                state.interests.append(Interest.fromText(line))
+                s = Statement.fromText(line)
+                state.statement_list.addStatement(s)
         return state
 
     def sets(self, var):

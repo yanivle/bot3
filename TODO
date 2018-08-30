@@ -1,3 +1,58 @@
+Need to allow choosing side effects in interactive mode instead of fixed utts.
+
+Need to prefer utt that advance us towards several goals.
+E.g.:
+R:What time are you available?
+*AVAILABILITY[TIME=6pm]
+*AVAILABILITY[TIME=7pm]
+*AVAILABILITY[TIME=8pm]
+*AGREED_TIME[TIME=6pm]
+*AGREED_TIME[TIME=7pm]
+*AGREED_TIME[TIME=8pm]
+Should be preferred to:
+Can you do 7pm?
+*AVAILABILITY[TIME=7pm]
+*AGREED_TIME[TIME=7pm]
+Need to improve response_logic somehow.
+
+Need some way to enforce order: we want to robot to query for AVAILABILITY[TIME=7pm]
+before it queries for AGREED_TIME[TIME=7pm].
+Option 1: Make the goal require both availability and agreed time.
+
+H:I can do 8pm
+AVAILABILITY[TIME=8pm]=True
+R:Let's do 8pm then
+AGREED_TIME[TIME=8pm]=True
+O_O - how do we make sure the bot doesn't take a shortcut to AGREED_TIME without
+passing through AVAILABILITY first???
+Option 1:
+R:Can you do 8pm?
+*AVAILABILITY[TIME=8pm]
+*AGREED_TIME[TIME=8pm]
+Solution 1: (?)
+R:What times are you available?
+*AVAILABILITY[TIME=6pm]
+*AVAILABILITY[TIME=7pm]
+*AVAILABILITY[TIME=8pm]
+*AGREED_TIME[TIME=6pm]
+*AGREED_TIME[TIME=7pm]
+*AGREED_TIME[TIME=8pm]
+Solution 2: (?)
+use probs
+R:Let's do 8pm then
+AGREED_TIME[TIME=8pm]=True +0.2
+
+
+Think about adding Interest in statement not just variable.
+So, e.g.
+Can you do 8pm?
+*AGREED_TIME=8
+Which would get us closer to AGREED_TIME=8 than *AGREED_TIME
+Another option would be to start actually doing a graph search.
+(but might need to add support for conditional expressions...)
+
+
+
 think about:
 R: For 7pm
 H: I can do 8m
@@ -7,6 +62,17 @@ NO_AVAILABILITY[TIME=7PM]=True 0.4
 
 think about conditions:
   e.g. min reservation size 5
+
+Add confidence (absolute and relative)
+  think about this - do i really need both?
+  what happens if VAR changes value? keeps same value?
+  how to implement diffs?
+  VAR=value 0.4 # absolute
+  VAR=value +0.4 # relative
+  ProbStatement
+    prob
+    prob_delta = 0
+
 
 add prepositions to state
   positive_prep
@@ -28,16 +94,6 @@ add prepositions to state
   !CONFIRM=False +0.5
   *CONFIRM
 
-
-Add confidence (absolute and relative)
-  think about this - do i really need both?
-  what happens if VAR changes value? keeps same value?
-  how to implement diffs?
-  VAR=value 0.4 # absolute
-  VAR=value +0.4 # relative
-  ProbStatement
-    prob
-    prob_delta = 0
 
 Verifies implemented as interest + statement + preposition
 For 4pm

@@ -1,3 +1,11 @@
+Do you have anything between 7pm and 8pm?
+*AVAILABILITY[TIME=7pm]
+*AGREED_TIME[TIME=7pm]
+*AVAILABILITY[TIME=7:30pm]
+*AGREED_TIME[TIME=7:30pm]
+*AVAILABILITY[TIME=8pm]
+*AGREED_TIME[TIME=8pm]
+---
 Hi! Can I book a table for 7pm tomorrow for 5 people?
 PURPOSE=BOOK_RESERVATION
 TIME=7pm

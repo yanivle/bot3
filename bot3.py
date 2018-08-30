@@ -20,6 +20,7 @@ for goal in goals:
     print()
 
 initial_state = state_module.State.fromText('''
+WALKINS_ACCEPTED=False
 RESERVATIONS_ACCEPTED=True
 RESERVATIONS_ACCEPTED[PARTY_SIZE=5]=True
 RESERVATIONS_ACCEPTED[TIME=7pm]=True
