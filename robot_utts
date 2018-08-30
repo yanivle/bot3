@@ -1,12 +1,12 @@
 Hi! Can I book a table for 7pm tomorrow for 5 people?
 PURPOSE=BOOK_RESERVATION
-TIME=7pm
+PREFERRED_TIME=7pm
 DATE=tomorrow
 PARTY_SIZE=5
 ---
 For tomorrow at 7pm
 DATE=tomorrow
-TIME=7pm
+PREFERRED_TIME=7pm
 ---
 For tomorrow
 DATE=tomorrow
@@ -21,13 +21,13 @@ How long would the wait be?
 *ESTIMATED_WAIT
 ---
 For 7pm please
-TIME=7pm
+PREFERRED_TIME=7pm
 ---
 I need a table for 7pm
-TIME=7pm
+PREFERRED_TIME=7pm
 ---
 It's for 7pm
-TIME=7pm
+PREFERRED_TIME=7pm
 ---
 I need a table for 5 people
 PARTY_SIZE=5

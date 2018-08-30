@@ -1,6 +1,6 @@
 Ok for 6 people, for what time?
 PARTY_SIZE=6
-*TIME
+*PREFERRED_TIME
 ---
 Ok
 ---
@@ -30,6 +30,9 @@ AVAILABILITY[TIME=5pm]=True
 I have availability for 6pm
 AVAILABILITY[TIME=6pm]=True
 ---
+I don't have availability for 7pm
+AVAILABILITY[TIME=7pm]=False
+---
 What's the first name?
 *FIRST_NAME
 ---
@@ -43,12 +46,12 @@ You are all set
 CONFIRM=True
 ---
 You are all set for 5pm
-TIME=5pm
+AGREED_TIME=5pm
 CONFIRM=True
 ---
 You are all set for tomorrow at 5pm
 DATE=tomorrow
-TIME=5pm
+AGREED_TIME=5pm
 CONFIRM=True
 ---
 Tomorrow? It should be a very short wait
@@ -74,13 +77,14 @@ We have valet parking
 PARKING_INFO.VALET=True
 ---
 I can do 8pm
-TIME=8pm
+POSSIBLE_TIME1=8pm
+# TODO: need to also reduce likelyhood of POSSIBLE_TIME=7pm once I add probs
 ---
 Who are you?
 *BOT_IDENTITY
 ---
 Ok for 6pm
-TIME=6pm
+AGREED_TIME=6pm
 ---
 Ok for lunch
 MEAL=lunch
