@@ -14,8 +14,12 @@ class State(object):
     interests: List[Interest]
 
     @staticmethod
+    def emptyState():
+        return State(StatementList({}), [])
+
+    @staticmethod
     def fromText(text):
-        state = State(StatementList({}), [])
+        state = State.emptyState()
         for line in text.split('\n'):
             if not line:
                 continue

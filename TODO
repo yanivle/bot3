@@ -1,3 +1,10 @@
+Allow inherited goals
+
+And support NOT_WRONG:MEAL=dinner
+Allow goals to include OR:A=X,B=Y,C=Z
+Also support OR:A=a1,A=a2,A=a3
+
+
 think about conditions:
   e.g. min reservation size 5
 
@@ -21,10 +28,6 @@ add prepositions to state
   !CONFIRM=False +0.5
   *CONFIRM
 
-
-Allow goals to include OR:A=X,B=Y,C=Z
-Also support OR:A=a1,A=a2,A=a3
-And support NOT_WRONG:MEAL=dinner
 
 Add confidence (absolute and relative)
   think about this - do i really need both?

@@ -17,3 +17,16 @@ def parseBlockSpec(filename, blockParseFunction):
 
 def createBlockSpecParser(blockParseFunction):
     return lambda filename: parseBlockSpec(filename, blockParseFunction)
+
+
+def getBlocks(lines, block_titles):
+    res = {}
+    current_block = None
+    for line in lines:
+        if line in block_titles:
+            current_block = line
+        else:
+            if current_block not in res:
+                res[current_block] = []
+            res[current_block].append(line)
+    return res

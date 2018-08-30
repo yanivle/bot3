@@ -10,6 +10,7 @@ class Goal(object):
     name: str
     priority: float
     state: state_module.State
+    not_wrongs_state: state_module.State
 
     @staticmethod
     def fromText(txt_block):
@@ -17,8 +18,14 @@ class Goal(object):
         r = parse.parse("{name} PRIORITY={priority}", lines[0])
         name = r['name']
         priority = float(r['priority'])
-        state = state_module.State.fromText('\n'.join(lines[1:]))
-        return Goal(name, priority, state)
+
+        NOT_WRONGS_HEADER = '>>>NOT WRONGS<<<'
+        blocks = block_parser.getBlocks(lines, [NOT_WRONGS_HEADER])
+        state = state_module.State.fromText('\n'.join(blocks[None]))
+        not_wrongs_state = state_module.State.emptyState()
+        if NOT_WRONGS_HEADER in blocks:
+            not_wrongs_state = state_module.State.fromText('\n'.join(blocks[NOT_WRONGS_HEADER]))
+        return Goal(name, priority, state, not_wrongs_state)
 
     def satisfiedByState(self, state):
         return all(state.evaluate(statement) for statement in self.statements)
