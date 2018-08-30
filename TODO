@@ -3,6 +3,12 @@ A[X=Y]=B
 becomes:
 "A[X" = "Y]=B"
 
+solve OR bug:
+>>>OR<<<
+A=X
+A=Y
+Doesn't work as I am using StatementList
+
 think about:
 R: For 7pm
 H: I can do 8m

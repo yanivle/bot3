@@ -31,6 +31,10 @@ class Goal(object):
     @staticmethod
     def _getStatementsForName(blocks, name):
         blocks = [b for b in blocks if b.name == name]
+        # BUG: doesn't support OR of the form:
+        # A=X
+        # A=Y
+        # As these overwrite eachother.
         statements = [statement.StatementList.fromText('\n'.join(b.lines)) for b in blocks]
         return statements
 
