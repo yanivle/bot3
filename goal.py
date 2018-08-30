@@ -31,12 +31,11 @@ class Goal(object):
     @staticmethod
     def _getStatementsForName(blocks, name):
         blocks = [b for b in blocks if b.name == name]
-        # BUG: doesn't support OR of the form:
-        # A=X
-        # A=Y
-        # As these overwrite eachother.
-        statements = [statement.StatementList.fromText('\n'.join(b.lines)) for b in blocks]
-        return statements
+        res = []
+        for b in blocks:
+            if b.name == name:
+                res.append([statement.Statement.fromText(line) for line in b.lines])
+        return res
 
     @staticmethod
     def fromText(txt_block):
@@ -50,17 +49,17 @@ class Goal(object):
         priority = float(r['priority'])
 
         blocks = block_parser.getBlocks(lines)
-        base_statement_lists = Goal._getStatementsForName(blocks, '')
-        not_wrongs_statement_lists = Goal._getStatementsForName(blocks, 'NOT WRONGS')
+        base_statements = Goal._getStatementsForName(blocks, '')
+        not_wrongs_statements = Goal._getStatementsForName(blocks, 'NOT WRONGS')
         or_statement_lists = Goal._getStatementsForName(blocks, 'OR')
 
-        assert(len(base_statement_lists) == 1), 'Not 1 base state for goal ' + name
-        base_statement_list = base_statement_lists[0]
-        assert(len(not_wrongs_statement_lists) <= 1), 'More than 1 NOT WRONGS state for goal ' + name
-        if not not_wrongs_statement_lists:
+        assert(len(base_statements) == 1), 'Not 1 base state for goal ' + name
+        base_statement_list = statement.StatementList.fromList(base_statements[0])
+        assert(len(not_wrongs_statements) <= 1), 'More than 1 NOT WRONGS state for goal ' + name
+        if not not_wrongs_statements:
             not_wrongs_statement_list = statement.StatementList({})
         else:
-            not_wrongs_statement_list = not_wrongs_statement_lists[0]
+            not_wrongs_statement_list = statement.StatementList.fromList(not_wrongs_statements[0])
 
         if parent != '-':
             parent_goal = all_goals[parent]
@@ -69,7 +68,7 @@ class Goal(object):
 
         goal = Goal(name, priority, base_statement_list, not_wrongs_statement_list)
         if or_statement_lists:
-            for or_statement_combination in itertools.product(*[x.statements.values() for x in or_statement_lists]):
+            for or_statement_combination in itertools.product(*[x for x in or_statement_lists]):
                 name_suffix = '_'.join(repr(statement) for statement in or_statement_combination)
                 new_goal = goal.clone()
                 new_goal.name = goal.name + '_' + name_suffix
