@@ -1,3 +1,5 @@
+Move initial state to a spec file.
+
 Need to allow choosing side effects in interactive mode instead of fixed utts.
 
 Maybe add Interest probabilities?

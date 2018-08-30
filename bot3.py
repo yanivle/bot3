@@ -10,8 +10,8 @@ from diff import DiffType
 import var_spec
 import event_log
 
-bot_module_base = 'modules/rr'
-# bot_module_base = 'modules/haggler'
+# bot_module_base = 'modules/rr'
+bot_module_base = 'modules/haggler'
 robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
 human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
 goal_module.parseGoalsSpec(bot_module_base + '/goal_spec')
@@ -37,7 +37,8 @@ def getHumanUtt():
 
 
 # TODO: not initiating var_spec from Goal - fix.
-var_spec = var_spec.VarSpec.fromFileAndUpdate('var_spec', robot_utts + human_utts)
+var_spec = var_spec.VarSpec.fromFileAndUpdate(
+    bot_module_base + '/var_spec', robot_utts + human_utts)
 config = response_logic.Config(var_spec, repeated_utt_demotion=1)
 scoring_params = response_logic.ScoringParams(event_log.EventLog([]), config)
 
