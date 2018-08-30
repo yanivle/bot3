@@ -2,7 +2,7 @@ from itertools import chain, combinations
 import pprint
 import utt
 import response_logic
-import goal
+import goal as goal_module
 import state as state_module
 import colors
 import diff as diff_module
@@ -12,8 +12,8 @@ import event_log
 
 robot_utts = utt.parseUttSpec('robot_utts')
 human_utts = utt.parseUttSpec('human_utts')
-goal.parseGoalsSpec('goal_spec')
-goals = goal.all_goals.values()
+goal_module.parseGoalsSpec('goal_spec')
+goals = [goal for goal in goal_module.all_goals.values() if goal.priority > 0]
 
 for goal in goals:
     print(goal)
