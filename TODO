@@ -1,12 +1,3 @@
-demotion for all intents already used
-  keep set of all used intents and add demotion score for used ones
-
-Can repeat the same intent several times, example:
-Yes
-@positive
-Yes
-@positive
-
 think about conditions:
   e.g. min reservation size 5
 

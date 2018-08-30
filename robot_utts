@@ -7,6 +7,9 @@ PARTY_SIZE=5
 For tomorrow
 DATE=tomorrow
 ---
+It's for tomorrow
+DATE=tomorrow
+---
 So am I all set?
 *CONFIRM
 ---
@@ -14,6 +17,12 @@ How long would the wait be?
 *ESTIMATED_WAIT
 ---
 For 7pm please
+TIME=7pm
+---
+I need a table for 7pm
+TIME=7pm
+---
+It's for 7pm
 TIME=7pm
 ---
 I need a table for 5 people
