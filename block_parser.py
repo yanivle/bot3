@@ -1,3 +1,8 @@
+from dataclasses import dataclass, field, replace
+from typing import Dict, List
+import parse
+
+
 def removeComments(txt):
     lines = txt.split('\n')
     return '\n'.join(line for line in lines if not line or line[0] != '#')
@@ -19,14 +24,25 @@ def createBlockSpecParser(blockParseFunction):
     return lambda filename: parseBlockSpec(filename, blockParseFunction)
 
 
-def getBlocks(lines, block_titles):
-    res = {}
-    current_block = None
+def parseBlockHeader(line):
+    r = parse.parse('>>>{block_name}<<<', line)
+    if r:
+        return True, r['block_name']
+    return False, None
+
+
+@dataclass
+class Block(object):
+    name: str
+    lines: List[str]
+
+
+def getBlocks(lines):
+    res = [Block('', [])]
     for line in lines:
-        if line in block_titles:
-            current_block = line
+        is_header, block_name = parseBlockHeader(line)
+        if is_header:
+            res.append(Block(block_name, []))
         else:
-            if current_block not in res:
-                res[current_block] = []
-            res[current_block].append(line)
+            res[-1].lines.append(line)
     return res

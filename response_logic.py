@@ -97,12 +97,14 @@ class Score(object):
 def scoreUtt(state, goal, utt, scoring_params):
     score = Score()
     new_state, diff = applyUttAndDiff(state, utt)
-    diff_to_goal = diff_module.diffStates(new_state, goal.state)
+    diff_to_goal = diff_module.diffStatementLists(
+        new_state.statement_list, goal.statements)
 
     distance_to_goal = -distanceToGoal(new_state, diff_to_goal, scoring_params)
     score.addComponent('distance_to_goal', distance_to_goal)
 
-    diff_to_goal_not_wrongs = diff_module.diffStates(new_state, goal.not_wrongs_state)
+    diff_to_goal_not_wrongs = diff_module.diffStatementLists(
+        new_state.statement_list, goal.not_wrongs_statements)
     distance_to_goal_not_wrongs = - \
         distanceToGoalNotWrongs(new_state, diff_to_goal_not_wrongs, scoring_params)
     score.addComponent('not_wrongs', distance_to_goal_not_wrongs)

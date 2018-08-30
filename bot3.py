@@ -26,7 +26,8 @@ def getHumanUtt():
     return human_utts[idx]
 
 
-var_spec = var_spec.VarSpec.fromFileAndUpdate('var_spec', robot_utts + human_utts + goals)
+# TODO: not initiating var_spec from Goal - fix.
+var_spec = var_spec.VarSpec.fromFileAndUpdate('var_spec', robot_utts + human_utts)
 config = response_logic.Config(var_spec, repeated_utt_demotion=1)
 scoring_params = response_logic.ScoringParams(event_log.EventLog([]), config)
 
@@ -48,7 +49,7 @@ def interactiveMode(state):
         pprint.pprint(diff)
 
         diff_to_goal = diff_module.diffStatementLists(
-            state.statement_list, goal.state.statement_list, allowed_types=[DiffType.ADDED, DiffType.CHANGED])
+            state.statement_list, goal.statements, allowed_types=[DiffType.ADDED, DiffType.CHANGED])
         print(f'Diff towards goal "{colors.C(goal.name, colors.HEADER)}" {diff_to_goal}')
 
 

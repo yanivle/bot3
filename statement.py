@@ -35,6 +35,12 @@ class StatementList(object):
                 sl.addStatement(s)
         return sl
 
+    def extend(self, other):
+        '''Adds all statements from |other| whose vars are not set on self.'''
+        for var, statement in other.statements.items():
+            if var not in self.statements:
+                self.addStatement(statement)
+
     def has_var(self, var):
         return var in self.statements.keys()
 
