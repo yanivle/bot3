@@ -12,7 +12,12 @@ import event_log
 
 robot_utts = utt.parseUttSpec('robot_utts')
 human_utts = utt.parseUttSpec('human_utts')
-goals = goal.parseGoalsSpec('goal_spec')
+goal.parseGoalsSpec('goal_spec')
+goals = goal.all_goals.values()
+
+for goal in goals:
+    print(goal)
+    print()
 
 initial_state = state_module.State.fromText('''
 RESERVATIONS_ACCEPTED=True

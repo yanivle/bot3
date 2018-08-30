@@ -3,6 +3,7 @@ from typing import List
 import block_parser
 import statement
 import parse
+import itertools
 
 
 # This global object holds all goals already loaded to allow goal inheritance.
@@ -16,6 +17,17 @@ class Goal(object):
     statements: statement.StatementList
     not_wrongs_statements: statement.StatementList
 
+    def __repr__(self):
+        res = f'Goal: {self.name} (prio={self.priority})\n'
+        if self.statements.statements:
+            res += repr(self.statements) + '\n'
+        if self.not_wrongs_statements.statements:
+            res += 'NOT WRONGS: ' + repr(self.not_wrongs_statements) + '\n'
+        return res
+
+    def clone(self):
+        return Goal(self.name, self.priority, self.statements.clone(), self.not_wrongs_statements.clone())
+
     @staticmethod
     def _getStatementsForName(blocks, name):
         blocks = [b for b in blocks if b.name == name]
@@ -24,6 +36,8 @@ class Goal(object):
 
     @staticmethod
     def fromText(txt_block):
+        # TODO: note this function now doesn't return anything! As is can create
+        # more than 1 goal from a single goal due to OR blocks.
         lines = txt_block.split('\n')
         header_line = lines.pop(0)
         r = parse.parse("{name}({parent}) PRIORITY={priority}", header_line)
@@ -48,9 +62,18 @@ class Goal(object):
             parent_goal = all_goals[parent]
             base_statement_list.extend(parent_goal.statements)
             not_wrongs_statement_list.extend(parent_goal.not_wrongs_statements)
+
         goal = Goal(name, priority, base_statement_list, not_wrongs_statement_list)
-        all_goals[name] = goal
-        return goal
+        if or_statement_lists:
+            for or_statement_combination in itertools.product(*[x.statements.values() for x in or_statement_lists]):
+                name_suffix = '_'.join(repr(statement) for statement in or_statement_combination)
+                new_goal = goal.clone()
+                new_goal.name = goal.name + '_' + name_suffix
+                for or_statement in or_statement_combination:
+                    new_goal.statements.addStatement(or_statement)
+                all_goals[new_goal.name] = new_goal
+        else:
+            all_goals[name] = goal
 
 
 parseGoalsSpec = block_parser.createBlockSpecParser(Goal.fromText)

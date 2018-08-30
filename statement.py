@@ -12,12 +12,17 @@ class Statement(object):
 
     @staticmethod
     def fromText(text):
+        # BUG: need to pick the right most '=' as:
+        # A[X=Y]=B will now split incorrectly into "A[X" and "Y]=B".
         r = parse.parse("{var}={value}", text)
         if r:
             return Statement(r['var'], r['value'])
 
     def clone(self):
         return Statement(self.var, self.value)
+
+    def __repr__(self):
+        return f'{self.var}={self.value}'
 
 
 @dataclass
@@ -63,3 +68,6 @@ class StatementList(object):
 
     def __hash__(self):
         return hash(self.__key())
+
+    def __repr__(self):
+        return '(' + ', '.join(repr(x) for x in self.statements.values()) + ')'

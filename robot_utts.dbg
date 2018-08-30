@@ -1,5 +1,5 @@
-So am I all set?
-*CONFIRM
----
-How long would the wait be?
-*ESTIMATED_WAIT
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+PURPOSE=BOOK_RESERVATION
+TIME=7pm
+DATE=tomorrow
+PARTY_SIZE=5
