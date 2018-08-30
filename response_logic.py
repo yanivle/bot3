@@ -177,7 +177,7 @@ def bestReplyForAllGoals(state, goals, utts, scoring_params):
     all_scores = scoreForAllGoals(state, goals, utts, scoring_params)
     srtd = sorted(all_scores, key=lambda x: x[0].score, reverse=True)
     if VERBOSE:
-        for candidate in srtd[:5]:
+        for candidate in srtd[:25]:
             print(f'{candidate[0]} {candidate[2].name} - {colors.C(candidate[1].text, colors.WARNING)}')
     best = srtd[0]
     return best[2], best[1], best[0]

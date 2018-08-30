@@ -12,6 +12,10 @@ class DiffType(Enum):
     NOOP = 4
 
 
+def isWildcard(statement_list, var):
+    return statement_list.statements[var] == '*'
+
+
 def diffStatementLists(sl1, sl2, allowed_types=[DiffType.REMOVED, DiffType.ADDED, DiffType.CHANGED, DiffType.NOOP]):
     res = StatementListDiff([])
     vars_self = set(sl1.statements.keys())
@@ -23,7 +27,7 @@ def diffStatementLists(sl1, sl2, allowed_types=[DiffType.REMOVED, DiffType.ADDED
         for var in vars_other - vars_self:
             res.statement_diffs.append(StatementDiff(DiffType.ADDED, None, sl2.statements[var]))
     for var in vars_self & vars_other:
-        if sl1.statements[var].value != sl2.statements[var].value:
+        if sl1.statements[var].value != sl2.statements[var].value and not isWildcard(sl1, var) and not isWildcard(sl2, var):
             if DiffType.CHANGED in allowed_types:
                 res.statement_diffs.append(
                     StatementDiff(DiffType.CHANGED, sl1.statements[var], sl2.statements[var]))
