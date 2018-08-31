@@ -5,7 +5,6 @@ import parse
 import pprint
 from statement import Statement, StatementList
 from diff import StateDiff
-from interest import Interest
 
 
 @dataclass

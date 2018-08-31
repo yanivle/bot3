@@ -1,15 +1,12 @@
-Maybe add Interest probabilities?
-
-Consider replacing interests with predicted statements.
-Replace:
-For what time?
-*TIME
-With:
-*TIME=*
+Need some way to enforce order: we want to robot to query for AVAILABILITY[TIME=7pm]
+before it queries for AGREED_TIME[TIME=7pm].
+Option 1: Make the goal require both availability and agreed time.
 
 
+Refactor VarSpec to use standard block_parser?
 
-Need to prefer utt that advance us towards several goals.
+
+Need to prefer utt that advance us towards several goals?
 E.g.:
 R:What time are you available?
 *AVAILABILITY[TIME=6pm]
@@ -23,10 +20,6 @@ Can you do 7pm?
 *AVAILABILITY[TIME=7pm]
 *AGREED_TIME[TIME=7pm]
 Need to improve response_logic somehow.
-
-Need some way to enforce order: we want to robot to query for AVAILABILITY[TIME=7pm]
-before it queries for AGREED_TIME[TIME=7pm].
-Option 1: Make the goal require both availability and agreed time.
 
 H:I can do 8pm
 AVAILABILITY[TIME=8pm]=True

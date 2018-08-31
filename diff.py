@@ -2,7 +2,6 @@ from dataclasses import dataclass, field, replace
 from typing import Dict, List
 from enum import Enum
 from statement import Statement
-from interest import Interest
 
 
 class DiffType(Enum):
