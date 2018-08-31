@@ -41,15 +41,8 @@ def diffStatementLists(sl1, sl2, allowed_types=[DiffType.REMOVED, DiffType.ADDED
 
 def diffStates(s1, s2):
     res = StateDiff([], [])
-    res.statement_diffs = diffStatementLists(s1.statement_list, s2.statement_list).statement_diffs
-
-    interests_self = set(s1.interests)
-    interests_other = set(s2.interests)
-    for interest in interests_self - interests_other:
-        res.interest_diffs.append(InterestDiff(DiffType.REMOVED, interest))
-    for interest in interests_other - interests_self:
-        res.interest_diffs.append(InterestDiff(DiffType.ADDED, interest))
-
+    res.statement_diffs = diffStatementLists(s1.statements, s2.statements).statement_diffs
+    res.prediction_diffs = diffStatementLists(s1.predictions, s2.predictions).statement_diffs
     return res
 
 
@@ -83,29 +76,16 @@ class StatementListDiff(object):
 
 
 @dataclass
-class InterestDiff(object):
-    type: DiffType
-    interest: Interest
-
-    def __repr__(self):
-        if self.type == DiffType.ADDED:
-            return f'+{self.interest}'
-        elif self.type == DiffType.REMOVED:
-            return f'-{self.interest}'
-        else:
-            raise RuntimeError(self)
-
-
-@dataclass
 class StateDiff(object):
     statement_diffs: List[StatementDiff]
-    interest_diffs: List[InterestDiff]
+    prediction_diffs: List[StatementDiff]
 
     def __repr__(self):
         res = 'StateDiff:\n'
         for statement_diff in self.statement_diffs:
             if statement_diff.type != DiffType.NOOP:
                 res += repr(statement_diff) + '\n'
-        for interest_diff in self.interest_diffs:
-            res += repr(interest_diff) + '\n'
+        for statement_diff in self.prediction_diffs:
+            if statement_diff.type != DiffType.NOOP:
+                res += repr(statement_diff) + '\n'
         return res

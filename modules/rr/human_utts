@@ -1,11 +1,10 @@
 Ok for 6 people, for what time?
 PARTY_SIZE=6
-*PREFERRED_TIME
----
-Ok
+*PREFERRED_TIME=*
 ---
 Can you repeat the day please?
-*DATE
+DATE=?
+*DATE=*
 ---
 We unfortunately don't take reservations
 RESERVATIONS_ACCEPTED=False
@@ -26,30 +25,30 @@ RESERVATIONS_ACCEPTED[PARTY_SIZE=10]=True
 # Need to repeat this for other times, or abstract to a variable
 I have availability for 5pm
 AVAILABILITY[TIME=5pm]=True
-*AGREED_TIME[TIME=5pm]
+*AGREED_TIME[TIME=5pm]=*
 ---
 I have availability for 6pm
 AVAILABILITY[TIME=6pm]=True
-*AGREED_TIME[TIME=6pm]
+*AGREED_TIME[TIME=6pm]=*
 ---
 I don't have availability for 7pm
 AVAILABILITY[TIME=7pm]=False
 ---
 I have availability for 8pm
 AVAILABILITY[TIME=8pm]=True
-*AGREED_TIME[TIME=8pm]
+*AGREED_TIME[TIME=8pm]=*
 ---
 I don't have availability for 8pm
 AVAILABILITY[TIME=8pm]=False
 ---
 What's the first name?
-*FIRST_NAME
+*FIRST_NAME=*
 ---
 What's the last name?
-*LAST_NAME
+*LAST_NAME=*
 ---
 Can I have the phone number please?
-*PHONE_NUMBER
+*PHONE_NUMBER=*
 ---
 You are all set
 CONFIRM=True
@@ -74,13 +73,13 @@ It should be a very long wait
 ESTIMATED_WAIT=long
 ---
 Can I please get the first and the last name?
-*FIRST_NAME
-*LAST_NAME
+*FIRST_NAME=*
+*LAST_NAME=*
 ---
 Hello
 ---
 How can I help?
-*PURPOSE
+*PURPOSE=*
 ---
 We have valet parking
 PARKING_INFO.VALET=True
@@ -90,7 +89,7 @@ POSSIBLE_TIME1=8pm
 # TODO: need to also reduce likelyhood of POSSIBLE_TIME=7pm once I add probs
 ---
 Who are you?
-*BOT_IDENTITY
+*BOT_IDENTITY=*
 ---
 Ok for 6pm
 AGREED_TIME=6pm
@@ -102,7 +101,7 @@ Ok for dinner
 MEAL=dinner
 ---
 Is it for lunch or dinner?
-*MEAL
+*MEAL=*
 ---
 You said Jonny?
 FIRST_NAME=Jonny

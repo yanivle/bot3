@@ -3,7 +3,7 @@ import prioritized_keys
 
 
 def getKeysFromState(state):
-    return set(state.statement_list.statements.keys())
+    return set(state.statements.statements.keys()) | set(state.predictions.statements.keys())
 
 
 def getKeysFromStateContainer(container):

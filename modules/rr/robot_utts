@@ -15,10 +15,10 @@ It's for tomorrow
 DATE=tomorrow
 ---
 So am I all set?
-*CONFIRM
+*CONFIRM=*
 ---
 How long would the wait be?
-*ESTIMATED_WAIT
+*ESTIMATED_WAIT=*
 ---
 For 7pm please
 PREFERRED_TIME=7pm
@@ -30,16 +30,20 @@ It's for 7pm
 PREFERRED_TIME=7pm
 ---
 Can you do 8pm?
-*AVAILABILITY[TIME=8pm]
-*AGREED_TIME[TIME=8pm]
+USER_AVAILABILITY[TIME=8pm]=True
+*AVAILABILITY[TIME=8pm]=*
+*AGREED_TIME[TIME=8pm]=*
 ---
 Do you have anything between 7pm and 8pm?
-*AVAILABILITY[TIME=7pm]
-*AGREED_TIME[TIME=7pm]
-*AVAILABILITY[TIME=7:30pm]
-*AGREED_TIME[TIME=7:30pm]
-*AVAILABILITY[TIME=8pm]
-*AGREED_TIME[TIME=8pm]
+USER_AVAILABILITY[7pm]=True
+USER_AVAILABILITY[7:30pm]=True
+USER_AVAILABILITY[8pm]=True
+*AVAILABILITY[TIME=7pm]=*
+*AGREED_TIME[TIME=7pm]=*
+*AVAILABILITY[TIME=7:30pm]=*
+*AGREED_TIME[TIME=7:30pm]=*
+*AVAILABILITY[TIME=8pm]=*
+*AGREED_TIME[TIME=8pm]=*
 ---
 I need a table for 5 people
 PARTY_SIZE=5
@@ -54,7 +58,7 @@ The phone number is 2125655611
 PHONE_NUMBER=2125655611
 ---
 What's the wait please?
-*ESTIMATED_WAIT
+*ESTIMATED_WAIT=*
 ---
 Hmm
 ---

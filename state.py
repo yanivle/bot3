@@ -10,25 +10,19 @@ from interest import Interest
 
 @dataclass
 class State(object):
-    statement_list: StatementList
-    interests: List[Interest]
-
-    @staticmethod
-    def emptyState():
-        return State(StatementList({}), [])
+    statements: StatementList = field(default_factory=StatementList)
+    predictions: StatementList = field(default_factory=StatementList)
 
     @staticmethod
     def fromText(text):
-        state = State.emptyState()
+        state = State()
         for line in text.split('\n'):
             if not line:
                 continue
-            i = Interest.fromText(line)
-            if i:
-                state.interests.append(i)
+            if line.startswith('*'):
+                state.predictions.addStatement(Statement.fromText(line[1:]))
             else:
-                s = Statement.fromText(line)
-                state.statement_list.addStatement(s)
+                state.statements.addStatement(Statement.fromText(line))
         return state
 
     @staticmethod
@@ -38,20 +32,19 @@ class State(object):
         return State.fromText(txt)
 
     def sets(self, var):
-        return var in self.statement_list.statements.keys()
+        return var in self.statements.statements.keys()
 
     def gets(self, var):
-        return any(var == interest.var for interest in self.interests)
+        return var in self.predictions.statements.keys()
 
     def resolveInterest(self, var):
         self.interests = [interest for interest in self.interests if interest.var != var]
 
     def clone(self):
-        return State(StatementList({k: v for (k, v) in self.statement_list.statements.items()}),
-                     [i for i in self.interests])
+        return State(self.statements.clone(), self.predictions.clone())
 
     def __key(self):
-        return (self.statement_list.__key(), tuple(self.interests))
+        return (self.statements.__key(), tuple(self.interests))
 
     def __hash__(self):
         return hash(self.__key())

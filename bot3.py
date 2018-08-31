@@ -68,7 +68,7 @@ def interactiveMode(state):
         pprint.pprint(diff)
 
         diff_to_goal = diff_module.diffStatementLists(
-            state.statement_list, goal.statements, allowed_types=[DiffType.ADDED, DiffType.CHANGED])
+            state.statements, goal.statements, allowed_types=[DiffType.ADDED, DiffType.CHANGED])
         print(f'Diff towards goal "{colors.C(goal.name, colors.HEADER)}" {diff_to_goal}')
 
 

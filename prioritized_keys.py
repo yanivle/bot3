@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict
 from util import flatten
-import parse
 import functools
 
 
@@ -36,6 +35,6 @@ class PrioritizedKeys(object):
         txt = f.read()
         lines = txt.split('\n')
         for line in lines:
-            r = parse.parse("{key}:{priority}", line)
-            if r:
-                self.keys[r['key']] = float(r['priority'])
+            if line:
+                var, eq, priority = line.rpartition(':')
+                self.keys[var] = float(priority)

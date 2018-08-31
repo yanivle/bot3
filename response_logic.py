@@ -18,22 +18,23 @@ def neighbors(state, utts):
 def applyUtt(state, utt):
     state = state.clone()
     for var, statement in utt.state.statements.items():
-        state.statement_list.addStatement(statement)
-    state.interests = utt.state.interests
+        state.statements.addStatement(statement)
+    state.predictions = utt.state.predictions
     return state
 
 
 def applyUttAndDiff(org_state, utt):
     state = org_state.clone()
-    for var, statement in utt.state.statement_list.statements.items():
-        state.statement_list.addStatement(statement)
-    state.interests = utt.state.interests
+    for var, statement in utt.state.statements.statements.items():
+        state.statements.addStatement(statement)
+    state.predictions = utt.state.predictions
     return state, diff_module.diffStates(org_state, state)
 
 
-def answersInterest(state, utt):
-    for interest in state.interests:
-        if utt.state.sets(interest.var):
+# BUG: need to consider to value too (not only the var).
+def fullfillsPrediction(state, utt):
+    for var, value in state.predictions.statements.items():
+        if utt.state.sets(var):
             return True
     return False
 
@@ -66,13 +67,12 @@ def redundantActions(diff):
     return sum(1 for d in diff.statement_diffs if d.type == diff_module.DiffType.NOOP)
 
 
-def redundantInterests(diff, interests):
+def redundantPredictions(diff, predictions):
     res = 0
     needed_vars = [
         statement_diff.statement2.var for statement_diff in diff.statement_diffs if statement_diff.type == diff_module.DiffType.ADDED]
-    for interest in interests:
-        var = interest.var
-        if interest.var not in needed_vars:
+    for var in predictions.statements.keys():
+        if var not in needed_vars:
             res += 1
     return res
 
@@ -98,13 +98,13 @@ def scoreUtt(state, goal, utt, scoring_params):
     score = Score()
     new_state, diff = applyUttAndDiff(state, utt)
     diff_to_goal = diff_module.diffStatementLists(
-        new_state.statement_list, goal.statements)
+        new_state.statements, goal.statements)
 
     distance_to_goal = -distanceToGoal(new_state, diff_to_goal, scoring_params)
     score.addComponent('distance_to_goal', distance_to_goal)
 
     diff_to_goal_not_wrongs = diff_module.diffStatementLists(
-        new_state.statement_list, goal.not_wrongs_statements)
+        new_state.statements, goal.not_wrongs_statements)
     distance_to_goal_not_wrongs = - \
         distanceToGoalNotWrongs(new_state, diff_to_goal_not_wrongs, scoring_params)
     score.addComponent('not_wrongs', distance_to_goal_not_wrongs)
@@ -112,11 +112,11 @@ def scoreUtt(state, goal, utt, scoring_params):
     redundant_actions = -10 * redundantActions(diff_module.diffStates(utt.state, state))
     score.addComponent('redundant_actions', redundant_actions)
 
-    redundant_interests = -2 * redundantInterests(diff_to_goal, utt.state.interests)
-    score.addComponent('redundant_interests', redundant_interests)
+    redundant_predictions = -2 * redundantPredictions(diff_to_goal, utt.state.predictions)
+    score.addComponent('redundant_predictions', redundant_predictions)
 
-    answers_interest = 200 if answersInterest(state, utt) else 0
-    score.addComponent('answers_interest', answers_interest)
+    fullfilled_predictions = 200 if fullfillsPrediction(state, utt) else 0
+    score.addComponent('fullfilled_predictions', fullfilled_predictions)
 
     repeated_utt_demotion = -scoring_params.config.repeated_utt_demotion * \
         scoring_params.event_log.utts.count(utt)

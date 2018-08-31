@@ -25,7 +25,7 @@ class Statement(object):
 
 @dataclass
 class StatementList(object):
-    statements: Dict[str, Statement]
+    statements: Dict[str, Statement] = field(default_factory=dict)
 
     @staticmethod
     def fromText(text):
