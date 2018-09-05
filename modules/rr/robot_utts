@@ -32,7 +32,7 @@ PREFERRED_TIME=7pm
 Can you do 8pm?
 USER_AVAILABILITY[TIME=8pm]=True
 *AVAILABILITY[TIME=8pm]=*
-*AGREED_TIME[TIME=8pm]=*
+*AGREED_TIME=8pm
 ---
 Do you have anything between 7pm and 8pm?
 USER_AVAILABILITY[7pm]=True

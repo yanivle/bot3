@@ -52,8 +52,8 @@ scoring_params = response_logic.ScoringParams(event_log.EventLog([]), config)
 
 def interactiveMode(state):
     while True:
-        # human_utt = getHumanUtt()
-        human_utt = getHumanUttFreeform()
+        human_utt = getHumanUtt()
+        # human_utt = getHumanUttFreeform()
         scoring_params.event_log.add(human_utt)
         state, diff = response_logic.applyUttAndDiff(state, human_utt)
         print(colors.C(human_utt.text, colors.OKBLUE))

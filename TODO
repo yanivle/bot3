@@ -1,3 +1,27 @@
+Time variables:
+PREFERRED_TIME=...
+USER_AVAILABILITY[TIME=...]=...
+BUSINESS_AVAILABILITY[TIME=]=...
+HUMAN_AGREED_TIME=
+ROBOT_AGREED_TIME=
+---
+R:For tomorrow at 7pm
+PREFERRED_TIME=7pm
+*AGREED_TIME=7pm
+---
+H:I can't do 7pm, but I can do 8pm
+H:AVAILABILITY[TIME=7pm]=False
+H:AVAILABILITY[TIME=8pm]=True
+*AGREED_TIME=8pm
+---
+R:Can you do anytime between 7pm and 8pm?
+R:AVAILABILITY[TIME=7pm]=True
+R:AVAILABILITY[TIME=7:30pm]=True
+R:AVAILABILITY[TIME=8pm]=True
+*AGREED_TIME=*
+
+
+
 Need some way to enforce order: we want to robot to query for AVAILABILITY[TIME=7pm]
 before it queries for AGREED_TIME[TIME=7pm].
 Option 1: Make the goal require both availability and agreed time.
