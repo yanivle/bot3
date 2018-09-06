@@ -59,20 +59,25 @@ class StatementList(object):
 
     def value(self, var):
         if var in self.statements:
-            return self.statements[var]
+            return self.statements[var].value
         return '?'
 
     def evaluate(self, statement):
-        return self.value(statement.var) == statement.value
+        val = self.value(statement.var)
+        # BUG: is it ok that I'm not checking what happens if val == '*'?
+        assert val != '*'
+        if statement.value == '*':
+            return val != '?'
+        return val == statement.value
 
     def addStatement(self, statement):
         self.statements[statement.var] = statement
 
-    def __key(self):
+    def _key(self):
         return (tuple(self.statements.values()))
 
     def __hash__(self):
-        return hash(self.__key())
+        return hash(self._key())
 
     def __repr__(self):
         return '(' + ', '.join(repr(x) for x in self.statements.values()) + ')'

@@ -42,8 +42,8 @@ class State(object):
     def clone(self):
         return State(self.statements.clone(), self.predictions.clone())
 
-    def __key(self):
-        return (self.statements.__key(), tuple(self.interests))
+    def _key(self):
+        return (self.statements._key(), self.predictions._key())
 
     def __hash__(self):
-        return hash(self.__key())
+        return hash(self._key())

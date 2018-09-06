@@ -10,6 +10,36 @@ import itertools
 all_goals = {}
 
 
+class GoalsQueue(object):
+    # HACK: this all_goals global is really ugly - remove this...
+    def __init__(self, state):
+        self.state = state
+        self._buildGoals()
+
+    def _buildGoals(self):
+        priority_to_goals = {}
+        for name, goal in all_goals.items():
+            if goal.priority not in priority_to_goals:
+                priority_to_goals[priority] = []
+            priority_to_goals[priority].append(goal)
+
+        self.goals_queue = []
+        for priority in sorted(priority_to_goals.keys()):
+            self.goals_queue.append(priority_to_goals[priority])
+
+    def activeGoals(self):
+        '''Returns the active goals list.
+        The active goals are the first (highest priority) goals that can be fulfilled.
+        This is a list as there can be ties.'''
+        for goals_list in self.goals_queue:
+            res = []
+            for goal in goals_list:
+                if self.state.canSatisfy(goal):
+                    res.append(goal)
+            if res:
+                return res
+
+
 @dataclass
 class Goal(object):
     name: str
@@ -24,6 +54,12 @@ class Goal(object):
         if self.not_wrongs_statements.statements:
             res += 'NOT WRONGS: ' + repr(self.not_wrongs_statements) + '\n'
         return res
+
+    def satisfiedBy(self, state):
+        for var, statement in self.statements.statements.items():
+            if not state.statements.evaluate(statement):
+                return False
+        return True
 
     def clone(self):
         return Goal(self.name, self.priority, self.statements.clone(), self.not_wrongs_statements.clone())

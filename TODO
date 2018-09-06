@@ -1,3 +1,22 @@
+Change response_logic to always prefer the single best goal (in the future this can be a list with ties).
+Change response_logic to actually simulate the conversation (bfs).
+Human side doesn't do anything, unless we have a target for the human.
+
+Each intent gets:
+statements (changes to the list)
+statements (add temporary goals to the other side)
+requirements (set of conditions on the state that allow saying the utt)
+
+Overall state of the infra is:
+robot_intents
+
+---
+
+Use proper parsers (I started something in line_parser).
+
+Change predictions to temporary goals.
+  Add a GoalQueue class for each side.
+
 Time variables:
 PREFERRED_TIME=...
 USER_AVAILABILITY[TIME=...]=...

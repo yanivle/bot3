@@ -3,32 +3,10 @@ import colors
 import diff as diff_module
 from var_spec import VarSpec
 import event_log
+import state as state_module
+import goal
 
 VERBOSE = False
-
-
-def neighbors(state, utts):
-    '''return set() of neighbor State.'''
-    res = set()
-    for utt in utts:
-        res.add(applyUtt(state, utt))
-    return res
-
-
-def applyUtt(state, utt):
-    state = state.clone()
-    for var, statement in utt.state.statements.items():
-        state.statements.addStatement(statement)
-    state.predictions = utt.state.predictions
-    return state
-
-
-def applyUttAndDiff(org_state, utt):
-    state = org_state.clone()
-    for var, statement in utt.state.statements.statements.items():
-        state.statements.addStatement(statement)
-    state.predictions = utt.state.predictions
-    return state, diff_module.diffStates(org_state, state)
 
 
 # BUG: need to consider to value too (not only the var).
@@ -96,7 +74,7 @@ class Score(object):
 
 def scoreUtt(state, goal, utt, scoring_params):
     score = Score()
-    new_state, diff = applyUttAndDiff(state, utt)
+    new_state = utt.applyToState(state)
     diff_to_goal = diff_module.diffStatementLists(
         new_state.statements, goal.statements)
 
@@ -126,20 +104,6 @@ def scoreUtt(state, goal, utt, scoring_params):
     score.addComponent('goal_priority', goal.priority)
 
     return score
-
-
-def bfsPaths(start, goal, max_depth=10):
-    res = []
-    queue = [(start, [start])]
-    while queue:
-        (vertex, path) = queue.pop(0)
-        for next in neighbors(vertex) - set(path):
-            if goal.satisfied_by(next):
-                res.append(path + [next])
-            else:
-                if len(path) < max_depth:
-                    queue.append((next, path + [next]))
-    return res
 
 
 def scoreForGoal(state, goal, utts, scoring_params):
@@ -177,7 +141,7 @@ def bestReplyForAllGoals(state, goals, utts, scoring_params):
     all_scores = scoreForAllGoals(state, goals, utts, scoring_params)
     srtd = sorted(all_scores, key=lambda x: x[0].score, reverse=True)
     if VERBOSE:
-        for candidate in srtd[:25]:
+        for candidate in srtd[:5]:
             print(f'{candidate[0]} {candidate[2].name} - {colors.C(candidate[1].text, colors.WARNING)}')
     best = srtd[0]
     return best[2], best[1], best[0]

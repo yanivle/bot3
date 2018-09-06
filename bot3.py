@@ -9,6 +9,7 @@ import diff as diff_module
 from diff import DiffType
 import var_spec
 import event_log
+import dialog_graph
 
 bot_module_base = 'modules/rr'
 # bot_module_base = 'modules/haggler'
@@ -16,12 +17,19 @@ robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
 human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
 goal_module.parseGoalsSpec(bot_module_base + '/goal_spec')
 goals = [goal for goal in goal_module.all_goals.values() if goal.priority > 0]
+goals = goals[0:1]
 
-for goal in goals:
-    print(goal)
-    print()
+for i, goal in enumerate(goals):
+    print(f'Goal {i}: {goal}\n')
 
 initial_state = state_module.State.fromFile(bot_module_base + '/initial_state')
+
+dg = dialog_graph.DialogGraph(robot_utts, human_utts, initial_state)
+paths_to_goal = dg.bfs(goals[0])
+
+print(f'Found total of {len(paths_to_goal)} paths to goal.')
+for path in paths_to_goal:
+    print(path)
 
 
 def getHumanUttFreeform():
@@ -55,7 +63,9 @@ def interactiveMode(state):
         human_utt = getHumanUtt()
         # human_utt = getHumanUttFreeform()
         scoring_params.event_log.add(human_utt)
-        state, diff = response_logic.applyUttAndDiff(state, human_utt)
+        new_state = human_utt.applyToState(state)
+        diff = diff_module.diffStates(state, new_state)
+        state = new_state
         print(colors.C(human_utt.text, colors.OKBLUE))
         pprint.pprint(diff)
 
@@ -63,7 +73,9 @@ def interactiveMode(state):
             state, goals, robot_utts, scoring_params)
         scoring_params.event_log.add(robot_utt)
         print(f'Advancing towards {colors.C(goal.name, colors.HEADER)} (score={score})')
-        state, diff = response_logic.applyUttAndDiff(state, robot_utt)
+        new_state = robot_utt.applyToState(state)
+        diff = diff_module.diffStates(state, new_state)
+        state = new_state
         print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
         pprint.pprint(diff)
 
@@ -74,5 +86,4 @@ def interactiveMode(state):
 
 response_logic.VERBOSE = True
 
-# initial_state = response_logic.applyUtt(initial_state, human_utts[3])
 interactiveMode(initial_state)

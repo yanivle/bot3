@@ -1,5 +1,4 @@
 # Preferred time = 7 but 7:30 and 8 ok too. These are the only 3 valid times.
-
 BASE_INPUT(-) PRIORITY=-1
 >>>NOT WRONGS<<<
 PREFERRED_TIME=7pm
@@ -20,7 +19,7 @@ RESERVATIONS_ACCEPTED=True
 ---
 
 RESERVATION_MADE(RESERVATION_MADE_BASE) PRIORITY=100
-AVAILABILITY[TIME=7pm]=True
+#AVAILABILITY[TIME=7pm]=True
 AGREED_TIME=7pm
 >>>OR<<<
 FIRST_NAME=Yaniv

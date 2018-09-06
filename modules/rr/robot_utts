@@ -15,7 +15,7 @@ It's for tomorrow
 DATE=tomorrow
 ---
 So am I all set?
-*CONFIRM=*
+*CONFIRM=True
 ---
 How long would the wait be?
 *ESTIMATED_WAIT=*
