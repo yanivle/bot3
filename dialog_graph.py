@@ -8,7 +8,6 @@ from state import State
 @dataclass(frozen=True)
 class Vertex(object):
     state: State
-    robot_turn: bool
 
     def __repr__(self):
         return f'{self.state}'
@@ -58,48 +57,38 @@ class DialogGraph(object):
     def __init__(self, robot_utts, human_utts, initial_state):
         self.robot_utts = robot_utts
         self.human_utts = human_utts
-        self.state = initial_state
-        self.robot_turn = True
-        self.start_vertex = Vertex(initial_state, True)
+        self.start_vertex = Vertex(initial_state)
 
     def neighbors(self, vertex):
         res = set()
-        if vertex.robot_turn:
+        if vertex.state.predictions.statements:
+            new_state = vertex.state.clone()
+            for var, prediction in vertex.state.predictions.statements.items():
+                new_state.statements.addStatement(prediction)
+            new_state.predictions.statements = {}
+            ev = EdgeAndVertex(Edge(None), Vertex(new_state))
+            res.add(ev)
+        else:
             for utt in self.robot_utts:
-                if utt.requirementsMet(self.state):
-                    new_state = utt.applyToState(self.state)
-                    ev = EdgeAndVertex(Edge(utt), Vertex(new_state, not vertex.robot_turn))
+                if utt.requirementsMet(vertex.state):
+                    new_state = utt.applyToState(vertex.state)
+                    ev = EdgeAndVertex(Edge(utt), Vertex(new_state))
                     res.add(ev)
-        else:  # Human turn.
-            if vertex.state.predictions.statements:
-                new_state = vertex.state.clone()
-                for var, prediction in vertex.state.predictions.statements.items():
-                    new_state.statements.addStatement(prediction)
-                new_state.predictions.statements = {}
-                ev = EdgeAndVertex(Edge(None), Vertex(new_state, not vertex.robot_turn))
-                res.add(ev)
         return res
 
-    def bfs(self, goal, max_depth=10, verbose=False):
+    def bfs(self, goal, max_depth=4):
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
         while queue:
             (vertex, path) = queue.pop(0)
-            print(path)
             neighbors = self.neighbors(vertex)
-            print('neighbors:')
-            print(neighbors)
-            print()
             for neighbor in neighbors:
                 if path.visited(neighbor.vertex):
-                    print('Already visited vertex')
                     continue
                 elif goal.satisfiedBy(neighbor.vertex.state):
-                    print('Goal satisfied')
                     res.append(path.add(neighbor))
                 elif len(path) < max_depth:
-                    print('Will explore neighbor')
                     queue.append((neighbor.vertex, path.add(neighbor)))
                 else:
-                    print('Not exploring further, max_depth=', max_depth, 'len(path)=', len(path))
+                    pass
         return res
