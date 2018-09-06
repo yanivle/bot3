@@ -6,3 +6,6 @@ DATE=tomorrow
 ---
 The first name is Yaniv
 FIRST_NAME=Yaniv
+---
+So am I all set?
+*CONFIRM=True

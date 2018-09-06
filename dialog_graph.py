@@ -39,7 +39,7 @@ class Path(object):
     def visited(self, vertex):
         return any(ev.vertex == vertex for ev in self.edges_and_vertices)
 
-    def add(self, ev):
+    def __add__(self, ev):
         return Path([ev for ev in self.edges_and_vertices] + [ev])
 
     def __len__(self):
@@ -76,7 +76,7 @@ class DialogGraph(object):
                     res.add(ev)
         return res
 
-    def bfs(self, goal, max_depth=4):
+    def bfs(self, goal, max_depth=10):
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
         while queue:
@@ -86,9 +86,10 @@ class DialogGraph(object):
                 if path.visited(neighbor.vertex):
                     continue
                 elif goal.satisfiedBy(neighbor.vertex.state):
-                    res.append(path.add(neighbor))
-                elif len(path) < max_depth:
-                    queue.append((neighbor.vertex, path.add(neighbor)))
+                    res.append(path + neighbor)
+                    max_depth = len(path)
+                elif len(path) <= max_depth:
+                    queue.append((neighbor.vertex, path + neighbor))
                 else:
                     pass
         return res
