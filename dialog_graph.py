@@ -80,19 +80,26 @@ class DialogGraph(object):
                 res.add(ev)
         return res
 
-    def bfs(self, goal, max_depth=10):
+    def bfs(self, goal, max_depth=10, verbose=False):
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
         while queue:
             (vertex, path) = queue.pop(0)
             print(path)
-            print()
             neighbors = self.neighbors(vertex)
+            print('neighbors:')
+            print(neighbors)
+            print()
             for neighbor in neighbors:
                 if path.visited(neighbor.vertex):
+                    print('Already visited vertex')
                     continue
-                if goal.satisfiedBy(neighbor.vertex.state):
+                elif goal.satisfiedBy(neighbor.vertex.state):
+                    print('Goal satisfied')
                     res.append(path.add(neighbor))
                 elif len(path) < max_depth:
+                    print('Will explore neighbor')
                     queue.append((neighbor.vertex, path.add(neighbor)))
+                else:
+                    print('Not exploring further, max_depth=', max_depth, 'len(path)=', len(path))
         return res

@@ -11,7 +11,7 @@ import var_spec
 import event_log
 import dialog_graph
 
-bot_module_base = 'modules/rr'
+bot_module_base = 'modules/rr_simple'
 # bot_module_base = 'modules/haggler'
 robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
 human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
