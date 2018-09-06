@@ -1,11 +1,24 @@
-For 5 people
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+PURPOSE=BOOK_RESERVATION
+PREFERRED_TIME=7pm
+DATE=tomorrow
 PARTY_SIZE=5
 ---
-For tomorrow
+For tomorrow at 7pm
 DATE=tomorrow
+PREFERRED_TIME=7pm
 ---
-The first name is Yaniv
-FIRST_NAME=Yaniv
+It's for tomorrow
+DATE=tomorrow
 ---
 So am I all set?
 *CONFIRM=True
+---
+For 7pm please
+PREFERRED_TIME=7pm
+---
+I need a table for 5 people
+PARTY_SIZE=5
+---
+The first name is Yaniv
+FIRST_NAME=Yaniv

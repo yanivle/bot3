@@ -4,7 +4,6 @@ from enum import Enum
 from utt import Utt
 from state import State
 
-
 @dataclass(frozen=True)
 class Vertex(object):
     state: State
@@ -79,8 +78,12 @@ class DialogGraph(object):
     def bfs(self, goal, max_depth=10):
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
+        visited_count = 0
         while queue:
+            visited_count += 1
             (vertex, path) = queue.pop(0)
+            print(f'Visited {visited_count} nodes.')
+            # print(vertex.state)
             neighbors = self.neighbors(vertex)
             for neighbor in neighbors:
                 if path.visited(neighbor.vertex):
