@@ -31,6 +31,9 @@ I have availability for 6pm
 AVAILABILITY[TIME=6pm]=True
 *AGREED_TIME[TIME=6pm]=*
 ---
+I have availability for 7pm
+AVAILABILITY[TIME=7pm]=True
+---
 I don't have availability for 7pm
 AVAILABILITY[TIME=7pm]=False
 ---

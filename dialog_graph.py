@@ -4,6 +4,7 @@ from enum import Enum
 from utt import Utt
 from state import State
 
+
 @dataclass(frozen=True)
 class Vertex(object):
     state: State
@@ -75,24 +76,34 @@ class DialogGraph(object):
                     res.add(ev)
         return res
 
-    def bfs(self, goal, max_depth=10):
+    def bfs(self, goal, max_path_length=10):
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
         visited_count = 0
         while queue:
             visited_count += 1
             (vertex, path) = queue.pop(0)
-            print(f'Visited {visited_count} nodes.')
-            # print(vertex.state)
+            if visited_count % 1024 == 0:
+                print(f'{len(res)} last path length: {len(res[-1])}')
+                print(f'Visited {visited_count} nodes.')
             neighbors = self.neighbors(vertex)
             for neighbor in neighbors:
                 if path.visited(neighbor.vertex):
                     continue
                 elif goal.satisfiedBy(neighbor.vertex.state):
                     res.append(path + neighbor)
-                    max_depth = len(path)
-                elif len(path) <= max_depth:
+                    max_path_length = len(path)
+                elif len(path) < max_path_length:
                     queue.append((neighbor.vertex, path + neighbor))
                 else:
                     pass
         return res
+
+
+def getNextUtt(state, robot_utts, human_utts, goals):
+    dg = DialogGraph(robot_utts, human_utts, state)
+    for goal in goals:
+        paths = bfs(goal)
+        if paths:
+            return paths[0].edges_and_vertices[1].edge.utt
+    return robot_utts[-1]

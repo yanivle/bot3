@@ -11,25 +11,17 @@ import var_spec
 import event_log
 import dialog_graph
 
-bot_module_base = 'modules/rr_simple'
+bot_module_base = 'modules/rr'
 # bot_module_base = 'modules/haggler'
 robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
 human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
 goal_module.parseGoalsSpec(bot_module_base + '/goal_spec')
 goals = [goal for goal in goal_module.all_goals.values() if goal.priority > 0]
-goals = goals[0:1]
 
 for i, goal in enumerate(goals):
     print(f'Goal {i}: {goal}\n')
 
 initial_state = state_module.State.fromFile(bot_module_base + '/initial_state')
-
-dg = dialog_graph.DialogGraph(robot_utts, human_utts, initial_state)
-paths_to_goal = dg.bfs(goals[0])
-
-print(f'Found total of {len(paths_to_goal)} paths to goal.')
-for path in paths_to_goal:
-    print(path)
 
 
 def getHumanUttFreeform():
@@ -60,6 +52,12 @@ scoring_params = response_logic.ScoringParams(event_log.EventLog([]), config)
 
 def interactiveMode(state):
     while True:
+        dg = dialog_graph.DialogGraph(robot_utts, human_utts, state)
+        paths_to_goal = dg.bfs(goals[0])
+        print(f'Found total of {len(paths_to_goal)} paths to goal.')
+        for path in paths_to_goal:
+            print(path)
+
         human_utt = getHumanUtt()
         # human_utt = getHumanUttFreeform()
         scoring_params.event_log.add(human_utt)
