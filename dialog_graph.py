@@ -3,6 +3,9 @@ from typing import List
 from enum import Enum
 from utt import Utt
 from state import State
+import colors
+import goal as goal_module
+import statement
 
 
 @dataclass(frozen=True)
@@ -18,7 +21,9 @@ class Edge(object):
     utt: Utt
 
     def __repr__(self):
-        return f'{self.utt}'
+        if self.utt:
+            return f'{self.utt.text}'
+        return '-'
 
 
 @dataclass(frozen=True)
@@ -27,9 +32,7 @@ class EdgeAndVertex(object):
     vertex: Vertex
 
     def __repr__(self):
-        if self.edge.utt:
-            return self.edge.utt.text
-        return '-'
+        return repr(self.edge)
 
 
 @dataclass
@@ -61,11 +64,12 @@ class DialogGraph(object):
 
     def neighbors(self, vertex):
         res = set()
-        if vertex.state.predictions.statements:
+        if vertex.state.allPredictionStatements():
             new_state = vertex.state.clone()
-            for var, prediction in vertex.state.predictions.statements.items():
-                new_state.statements.addStatement(prediction)
-            new_state.predictions.statements = {}
+            for prediction in vertex.state.allPredictionStatements():
+                new_state.statements.update(prediction)
+            new_state.predictions = statement.StatementList()
+            new_state.positive_predictions = statement.StatementList()
             ev = EdgeAndVertex(Edge(None), Vertex(new_state))
             res.add(ev)
         else:
@@ -83,27 +87,62 @@ class DialogGraph(object):
         while queue:
             visited_count += 1
             (vertex, path) = queue.pop(0)
-            if visited_count % 1024 == 0:
-                print(f'{len(res)} last path length: {len(res[-1])}')
-                print(f'Visited {visited_count} nodes.')
+            # print('Path:', path)
+            # print(f'Visited {visited_count} nodes.')
             neighbors = self.neighbors(vertex)
+            # print(f'{len(neighbors)} neighbors.')
             for neighbor in neighbors:
+                # print(f'neighbor: {neighbor}')
+                # print(neighbor.vertex.state)
                 if path.visited(neighbor.vertex):
+                    # print('Already visited')
                     continue
-                elif goal.satisfiedBy(neighbor.vertex.state):
+                elif goal.satisfiedByState(neighbor.vertex.state):
+                    # print('Satisfied!')
                     res.append(path + neighbor)
                     max_path_length = len(path)
                 elif len(path) < max_path_length:
-                    queue.append((neighbor.vertex, path + neighbor))
+                    if not goal.contradictedByState(neighbor.vertex.state):
+                        # print('Will explore.')
+                        queue.append((neighbor.vertex, path + neighbor))
+                    else:
+                        pass
+                        # print('Goal contradicted by state')
                 else:
                     pass
         return res
 
 
-def getNextUtt(state, robot_utts, human_utts, goals):
-    dg = DialogGraph(robot_utts, human_utts, state)
+def getActiveGoal(state, goals):
+    # TODO: need to consider positive_predictions here?
+    if state.predictions:
+        new_goal = goal_module.Goal(
+            'Interest', statement.GoalStatementList.fromStatementList(state.predictions))
+        return new_goal
     for goal in goals:
-        paths = bfs(goal)
-        if paths:
-            return paths[0].edges_and_vertices[1].edge.utt
+        # print(f'Trying: {goal.name}')
+        if goal.contradictedByState(state):
+            # print(f'{goal.name} contradicted - skipping')
+            continue
+        else:
+            # print(f'{goal.name} selected')
+            return goal
+
+
+def getNextUtt(state, robot_utts, human_utts, goals) -> Utt:
+    dg = DialogGraph(robot_utts, human_utts, state)
+    goal = getActiveGoal(state, goals)
+    if goal.satisfiedByState(state):
+        print('*** All done! ***')
+        return robot_utts[-1]
+    print(f'Advancing towards {colors.C(goal.name, colors.HEADER)}')
+    # TODO: think about the following 2 lines (is this the right place for this? should we do this at all?):
+    state.predictions = statement.StatementList()
+    state.positive_predictions = statement.StatementList()
+    paths = dg.bfs(goal)
+    print(f'Found total of {len(paths)} paths to goal.')
+    if paths:
+        print('Selected path:', paths[0])
+        return paths[0].edges_and_vertices[1].edge.utt
+    print('No path found to goal :(')
     return robot_utts[-1]

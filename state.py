@@ -11,6 +11,7 @@ from diff import StateDiff
 class State(object):
     statements: StatementList = field(default_factory=StatementList)
     predictions: StatementList = field(default_factory=StatementList)
+    positive_predictions: StatementList = field(default_factory=StatementList)
 
     @staticmethod
     def fromText(text):
@@ -19,10 +20,15 @@ class State(object):
             if not line:
                 continue
             if line.startswith('*'):
-                state.predictions.addStatement(Statement.fromText(line[1:]))
+                state.predictions.update(Statement.fromText(line[1:]))
+            elif line.startswith('@'):
+                state.positive_predictions.update(Statement.fromText(line[1:]))
             else:
-                state.statements.addStatement(Statement.fromText(line))
+                state.statements.update(Statement.fromText(line))
         return state
+
+    def allPredictionStatements(self):
+        return self.predictions.statements + self.positive_predictions.statements
 
     @staticmethod
     def fromFile(filename):
@@ -30,17 +36,8 @@ class State(object):
         txt = f.read()
         return State.fromText(txt)
 
-    def sets(self, var):
-        return var in self.statements.statements.keys()
-
-    def gets(self, var):
-        return var in self.predictions.statements.keys()
-
-    def resolveInterest(self, var):
-        self.interests = [interest for interest in self.interests if interest.var != var]
-
     def clone(self):
-        return State(self.statements.clone(), self.predictions.clone())
+        return State(self.statements.clone(), self.predictions.clone(), self.positive_predictions.clone())
 
     def _key(self):
         return (self.statements._key(), self.predictions._key())

@@ -25,21 +25,22 @@ RESERVATIONS_ACCEPTED[PARTY_SIZE=10]=True
 # Need to repeat this for other times, or abstract to a variable
 I have availability for 5pm
 AVAILABILITY[TIME=5pm]=True
-*AGREED_TIME[TIME=5pm]=*
+#*AGREED_TIME[TIME=5pm]=*
 ---
 I have availability for 6pm
 AVAILABILITY[TIME=6pm]=True
-*AGREED_TIME[TIME=6pm]=*
+@AGREED_TIME[TIME=6pm]=True
 ---
 I have availability for 7pm
 AVAILABILITY[TIME=7pm]=True
+@AGREED_TIME[TIME=7pm]=True
 ---
 I don't have availability for 7pm
 AVAILABILITY[TIME=7pm]=False
 ---
 I have availability for 8pm
 AVAILABILITY[TIME=8pm]=True
-*AGREED_TIME[TIME=8pm]=*
+@AGREED_TIME[TIME=8pm]=True
 ---
 I don't have availability for 8pm
 AVAILABILITY[TIME=8pm]=False
@@ -112,3 +113,6 @@ FIRST_NAME=Jonny
 John Smith?
 FIRST_NAME=John
 LAST_NAME=Smith
+---
+Yes
+@positive

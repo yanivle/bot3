@@ -12,29 +12,25 @@ class DiffType(Enum):
 
 
 def isWildcard(statement_list, var):
-    return statement_list.statements[var] == '*'
+    return statement_list.value(var) == '*'
 
 
-def diffStatementLists(sl1, sl2, allowed_types=[DiffType.REMOVED, DiffType.ADDED, DiffType.CHANGED, DiffType.NOOP]):
-    res = StatementListDiff([])
-    vars_self = set(sl1.statements.keys())
-    vars_other = set(sl2.statements.keys())
-    if DiffType.REMOVED in allowed_types:
-        for var in vars_self - vars_other:
-            res.statement_diffs.append(StatementDiff(DiffType.REMOVED, sl1.statements[var], None))
-    if DiffType.ADDED in allowed_types:
-        for var in vars_other - vars_self:
-            res.statement_diffs.append(StatementDiff(DiffType.ADDED, None, sl2.statements[var]))
-    for var in vars_self & vars_other:
-        if sl1.statements[var].value != sl2.statements[var].value and not isWildcard(sl1, var) and not isWildcard(sl2, var):
-            if DiffType.CHANGED in allowed_types:
-                res.statement_diffs.append(
-                    StatementDiff(DiffType.CHANGED, sl1.statements[var], sl2.statements[var]))
+@dataclass
+class DiffToGoal(object):
+    contradicted: List = field(default_factory=list)
+    satisfied: List = field(default_factory=list)
+    remaining: List = field(default_factory=list)
+
+
+def diffFromStateToGoal(state, goal) -> DiffToGoal:
+    res = DiffToGoal()
+    for goal_statement in goal.statements.statements:
+        if goal_statement.contradictedByStatementList(state.statements):
+            res.contradicted.append(goal_statement)
+        elif goal_statement.satisfiedByStatementList(state.statements):
+            res.satisfied.append(goal_statement)
         else:
-            if DiffType.NOOP in allowed_types:
-                res.statement_diffs.append(
-                    StatementDiff(DiffType.NOOP, sl1.statements[var], sl2.statements[var]))
-
+            res.remaining.append(goal_statement)
     return res
 
 

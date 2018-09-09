@@ -1,6 +1,3 @@
-import csv
-
-
 def flatten(l):
     return [item for sublist in l for item in sublist]
 
@@ -19,6 +16,11 @@ def peel(pattern, s):
     return None
 
 
+def peel_lines(pattern, lines):
+    res = [peel(pattern, line) for line in lines]
+    res = [x for x in res if x]
+    return res
+
+
 def parse_list(s):
-    reader = csv.reader(s)
-    return list(reader)
+    return [x.strip() for x in s.split(',')]

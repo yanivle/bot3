@@ -3,67 +3,72 @@ PURPOSE=BOOK_RESERVATION
 PREFERRED_TIME=7pm
 DATE=tomorrow
 PARTY_SIZE=5
+#####@AVAILABILITY[DATE=tomorrow,TIME=7pm]=True
 ---
 For tomorrow at 7pm
 DATE=tomorrow
 PREFERRED_TIME=7pm
----
-For tomorrow
-DATE=tomorrow
+#^AVAILABILITY[DATE=tomorrow,TIME=7pm]=True
+REQ(PURPOSE=BOOK_RESERVATION)
 ---
 It's for tomorrow
 DATE=tomorrow
+REQ(PURPOSE=BOOK_RESERVATION)
 ---
-So am I all set?
-*CONFIRM=True
+It's for 7pm
+PREFERRED_TIME=7pm
+REQ(PURPOSE=BOOK_RESERVATION)
+---
+Can you do 7:30pm?
+@AVAILABILITY[TIME=7:30pm]=True
+REQ(PURPOSE=BOOK_RESERVATION)
+---
+Can you do 8pm?
+@AVAILABILITY[TIME=8pm]=True
+REQ(PURPOSE=BOOK_RESERVATION)
+---
+I need a table for 5 people
+PARTY_SIZE=5
+REQ(PURPOSE=BOOK_RESERVATION)
+---
+The number is 2125655611
+PHONE_NUMBER=2125655611
+REQ(PURPOSE=BOOK_RESERVATION)
+---
+The last name is Leviathan
+LAST_NAME=Leviathan
+REQ(PURPOSE=BOOK_RESERVATION)
+---
+The first name is Yaniv
+FIRST_NAME=Yaniv
+REQ(PURPOSE=BOOK_RESERVATION)
+---
+#Do you need the first name?
+#@*FIRST_NAME=*
+#---
+So am I all set for tomorrow at 7pm?
+DATE=tomorrow
+@AGREED_TIME=7pm
+@CONFIRM=True
+REQ(DATE=tomorrow)
+REQ(PARTY_SIZE=5)
+REQ(PURPOSE=BOOK_RESERVATION)
+REQ(GROUP(AVAILABILITY[TIME=7pm]=True,PREFERRED_TIME=7pm))
+REQ(GROUP(FIRST_NAME=Yaniv,LAST_NAME=Leviathan,PHONE_NUMBER=2125655611))
+---
+So am I all set for 7:30pm?
+@AGREED_TIME=7pm
+@CONFIRM=True
+REQ(PURPOSE=BOOK_RESERVATION)
+REQ(AVAILABILITY[TIME=7:30pm]=True)
+---
+So am I all set for 8pm?
+@AGREED_TIME=8pm
+@CONFIRM=True
+REQ(PURPOSE=BOOK_RESERVATION)
+REQ(AVAILABILITY[TIME=8pm]=True)
 ---
 How long would the wait be?
 *ESTIMATED_WAIT=*
 ---
-For 7pm please
-PREFERRED_TIME=7pm
----
-I need a table for 7pm
-PREFERRED_TIME=7pm
----
-It's for 7pm
-PREFERRED_TIME=7pm
----
-Can you do 8pm?
-USER_AVAILABILITY[TIME=8pm]=True
-*AVAILABILITY[TIME=8pm]=*
-*AGREED_TIME=8pm
----
-Do you have anything between 7pm and 8pm?
-USER_AVAILABILITY[7pm]=True
-USER_AVAILABILITY[7:30pm]=True
-USER_AVAILABILITY[8pm]=True
-*AVAILABILITY[TIME=7pm]=*
-*AGREED_TIME[TIME=7pm]=*
-*AVAILABILITY[TIME=7:30pm]=*
-*AGREED_TIME[TIME=7:30pm]=*
-*AVAILABILITY[TIME=8pm]=*
-*AGREED_TIME[TIME=8pm]=*
----
-I need a table for 5 people
-PARTY_SIZE=5
----
-The first name is Yaniv
-FIRST_NAME=Yaniv
----
-The last name is Leviathan
-LAST_NAME=Leviathan
----
-The phone number is 2125655611
-PHONE_NUMBER=2125655611
----
-What's the wait please?
-*ESTIMATED_WAIT=*
----
-Hmm
----
-I'm Google's automated booking service
-BOT_IDENTITY=Google Assistant
----
-It's for dinner
-MEAL=dinner
+Hmm...
