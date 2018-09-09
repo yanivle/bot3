@@ -1,3 +1,14 @@
+think about verifies: NAME=JOHN how do we treat that?
+basically, some things if they are wrong, need correcting, others not
+
+add support for sorry/repeats
+
+
+
+
+
+-----
+
 Change response_logic to always prefer the single best goal (in the future this can be a list with ties).
 Change response_logic to actually simulate the conversation (bfs).
 Human side doesn't do anything, unless we have a target for the human.
