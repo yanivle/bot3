@@ -1,7 +1,9 @@
-1.this about interests - if interested by something we already gave, how do we model this?
-
-2.think about verifies: NAME=JOHN how do we treat that?
+1.think about verifies: NAME=JOHN how do we treat that?
 basically, some things if they are wrong, need correcting, others not
+
+2.this about interests - if interested by something we already gave, how do we model this?
+- possible solution: everytime I do *A=B also do A=?
+- also: if state has A=B, and adding A=C, instead set A=? (note that this depends on #1 above - do that first)
 
 3.add support for sorry/repeats
 
