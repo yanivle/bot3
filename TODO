@@ -1,3 +1,5 @@
+0. Add support for sub-goals: i.e. you have to satisfy part of the goal before satisfying another part
+
 1.think about verifies: NAME=JOHN how do we treat that?
 basically, some things if they are wrong, need correcting, others not
 
