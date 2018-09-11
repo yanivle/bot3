@@ -97,10 +97,6 @@ class GoalStatement(object):
     def __hash__(self):
         return hash(self._key())
 
-    # TODO: remove this
-    # def has_var(self, var):
-    #     return any(s.var == var for s in self.basics)
-
     def contradictedByStatement(self, statement):
         if self.type == GoalStatementType.GROUP:
             return any(basic.contradictedByStatement(statement) for basic in self.basics)
