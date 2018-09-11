@@ -20,6 +20,14 @@ for goal in goals:
     print(goal)
 
 
+def getHumanUttFromTest(test):
+    inp = test.pop(0)
+    print(colors.C('>>> ' + repr(inp), colors.BOLD))
+    lines = ['<TEST>'] + inp
+    res = utt.Utt.fromText('\n'.join(lines))
+    return res
+
+
 def getHumanUttFreeform():
     # print('Vars: ' + ', '.join(var_spec.keys.keys()))
     lines = ['<INTERACTIVE>']
@@ -46,36 +54,57 @@ def getHumanUtt():
 # scoring_params = response_logic.ScoringParams(event_log.EventLog([]), config)
 
 
+def runTests(state):
+    BASIC_FLOW = [[], [], [], ['@positive']]
+    ASK_FOR_DETAILS = [[], ['*R:DATE=*', 'R:DATE=?'],
+                       ['*R:FIRST_NAME=*', 'R:FIRST_NAME=?'], [], ['@positive']]
+    NO_RESERVATIONS_FLOW = [[], ['H:RESERVATIONS_ACCEPTED=False'], ['H:ESTIMATED_WAIT=short']]
+    NO_RESERVATIONS_FOR_7pm = [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False'], [
+        '@positive'], [], ['AGREED_TIME=7:30pm']]
+    NO_RESERVATIONS_FOR_7pm_and_730pm = [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False', 'H:RESERVATIONS_ACCEPTED[TIME=7:30pm]=False'], [
+        '@positive'], [], ['AGREED_TIME=8pm']]
+    tests = [BASIC_FLOW, ASK_FOR_DETAILS, NO_RESERVATIONS_FLOW,
+             NO_RESERVATIONS_FOR_7pm, NO_RESERVATIONS_FOR_7pm_and_730pm]
+    for test in tests:
+        print(colors.C(f'Resetting state', colors.FAIL))
+        state = initial_state.clone()
+        while test:
+            human_utt = getHumanUttFromTest(test)
+
+            state = human_utt.applyToState(state)
+            # print(colors.C(human_utt.text, colors.OKBLUE))
+            # print(state)
+
+            goal = dialog_graph.getActiveGoal(state, goals)
+
+            robot_utt = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
+            print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
+            state = robot_utt.applyToState(state)
+
+
 def interactiveMode(state):
     while True:
-        human_utt = getHumanUttFreeform()
-        # human_utt = getHumanUtt()
+        human_utt = getHumanUttFreeform(BASIC_FLOW)
 
-        new_state = human_utt.applyToState(state)
-        # diff = diff_module.diffStates(state, new_state)
-        state = new_state
+        state = human_utt.applyToState(state)
         print(colors.C(human_utt.text, colors.OKBLUE))
-        print(state)
-        # pprint.pprint(diff)
+        # print(state)
 
         goal = dialog_graph.getActiveGoal(state, goals)
 
         robot_utt = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
         print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
-        new_state = robot_utt.applyToState(state)
-        # diff = diff_module.diffStates(state, new_state)
-        state = new_state
-        print(state)
-        # pprint.pprint(diff)
+        state = robot_utt.applyToState(state)
+        # print(state)
 
-        diff_to_goal = diff_module.diffFromStateToGoal(state, goal)
-        print(f'Diff towards goal "{colors.C(goal.name, colors.HEADER)}":')
-        if diff_to_goal.contradicted:
-            print(f'  contradicted: {diff_to_goal.contradicted}')
-        if diff_to_goal.satisfied:
-            print(f'  satisfied: {diff_to_goal.satisfied}')
-        if diff_to_goal.remaining:
-            print(f'  remaining: {diff_to_goal.remaining}')
+        # diff_to_goal = diff_module.diffFromStateToGoal(state, goal)
+        # print(f'Diff towards goal "{colors.C(goal.name, colors.HEADER)}":')
+        # if diff_to_goal.contradicted:
+        #     print(f'  contradicted: {diff_to_goal.contradicted}')
+        # if diff_to_goal.satisfied:
+        #     print(f'  satisfied: {diff_to_goal.satisfied}')
+        # if diff_to_goal.remaining:
+        #     print(f'  remaining: {diff_to_goal.remaining}')
 
 
-interactiveMode(initial_state)
+runTests(initial_state)
