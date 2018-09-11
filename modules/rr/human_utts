@@ -1,118 +1,117 @@
 Ok for 6 people, for what time?
 PARTY_SIZE=6
-*PREFERRED_TIME=*
+*R:PREFERRED_TIME=*
 ---
 Can you repeat the day please?
-DATE=?
-*DATE=*
+R:DATE=?
+*R:DATE=*
 ---
 We unfortunately don't take reservations
-RESERVATIONS_ACCEPTED=False
+H:RESERVATIONS_ACCEPTED=False
 ---
 # Need to repeat this for all party sizes...
 We don't take reservations for parties less than 5
-RESERVATIONS_ACCEPTED[PARTY_SIZE=1]=False
-RESERVATIONS_ACCEPTED[PARTY_SIZE=2]=False
-RESERVATIONS_ACCEPTED[PARTY_SIZE=3]=False
-RESERVATIONS_ACCEPTED[PARTY_SIZE=4]=False
-RESERVATIONS_ACCEPTED[PARTY_SIZE=5]=True
-RESERVATIONS_ACCEPTED[PARTY_SIZE=6]=True
-RESERVATIONS_ACCEPTED[PARTY_SIZE=7]=True
-RESERVATIONS_ACCEPTED[PARTY_SIZE=8]=True
-RESERVATIONS_ACCEPTED[PARTY_SIZE=9]=True
-RESERVATIONS_ACCEPTED[PARTY_SIZE=10]=True
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=1]=False
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=2]=False
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=3]=False
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=4]=False
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=5]=True
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=6]=True
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=7]=True
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=8]=True
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=9]=True
+H:RESERVATIONS_ACCEPTED[PARTY_SIZE=10]=True
 ---
-# Need to repeat this for other times, or abstract to a variable
 I have availability for 5pm
-AVAILABILITY[TIME=5pm]=True
-#*AGREED_TIME[TIME=5pm]=*
+H:AVAILABILITY[TIME=5pm]=True
+@H:AGREED_TIME[TIME=5pm]=True
 ---
 I have availability for 6pm
-AVAILABILITY[TIME=6pm]=True
-@AGREED_TIME[TIME=6pm]=True
+H:AVAILABILITY[TIME=6pm]=True
+@H:AGREED_TIME[TIME=6pm]=True
 ---
 I have availability for 7pm
-AVAILABILITY[TIME=7pm]=True
-@AGREED_TIME[TIME=7pm]=True
+H:AVAILABILITY[TIME=7pm]=True
+@H:AGREED_TIME[TIME=7pm]=True
 ---
 I don't have availability for 7pm
-AVAILABILITY[TIME=7pm]=False
+H:AVAILABILITY[TIME=7pm]=False
 ---
 I have availability for 8pm
-AVAILABILITY[TIME=8pm]=True
-@AGREED_TIME[TIME=8pm]=True
+H:AVAILABILITY[TIME=8pm]=True
+@H:AGREED_TIME[TIME=8pm]=True
 ---
 I don't have availability for 8pm
-AVAILABILITY[TIME=8pm]=False
+H:AVAILABILITY[TIME=8pm]=False
 ---
 What's the first name?
-*FIRST_NAME=*
+*R:FIRST_NAME=*
 ---
 What's the last name?
-*LAST_NAME=*
+*R:LAST_NAME=*
 ---
 Can I have the phone number please?
-*PHONE_NUMBER=*
+*R:PHONE_NUMBER=*
 ---
 You are all set
-CONFIRM=True
+H:CONFIRM=True
 ---
 You are all set for 5pm
-AGREED_TIME=5pm
-CONFIRM=True
+H:AGREED_TIME=5pm
+H:CONFIRM=True
 ---
 You are all set for tomorrow at 5pm
-DATE=tomorrow
-AGREED_TIME=5pm
-CONFIRM=True
+R:DATE=tomorrow
+H:AGREED_TIME=5pm
+H:CONFIRM=True
 ---
 Tomorrow? It should be a very short wait
-DATE=tomorrow
-ESTIMATED_WAIT=short
+R:DATE=tomorrow
+H:ESTIMATED_WAIT=short
 ---
 It should be a very short wait
-ESTIMATED_WAIT=short
+H:ESTIMATED_WAIT=short
 ---
 It should be a very long wait
-ESTIMATED_WAIT=long
+H:ESTIMATED_WAIT=long
 ---
 Can I please get the first and the last name?
-*FIRST_NAME=*
-*LAST_NAME=*
+*R:FIRST_NAME=*
+*R:LAST_NAME=*
 ---
 Hello
 ---
 How can I help?
-*PURPOSE=*
+*R:PURPOSE=*
 ---
 We have valet parking
-PARKING_INFO.VALET=True
+H:PARKING_INFO.VALET=True
 ---
 I can do 8pm
-POSSIBLE_TIME1=8pm
+H:POSSIBLE_TIME1=8pm
 # TODO: need to also reduce likelyhood of POSSIBLE_TIME=7pm once I add probs
 ---
 Who are you?
-*BOT_IDENTITY=*
+*R:BOT_IDENTITY=*
 ---
 Ok for 6pm
-AGREED_TIME=6pm
+H:AGREED_TIME=6pm
 ---
 Ok for lunch
-MEAL=lunch
+R:MEAL=lunch
 ---
 Ok for dinner
-MEAL=dinner
+R:MEAL=dinner
 ---
 Is it for lunch or dinner?
-*MEAL=*
+*R:MEAL=*
 ---
 You said Jonny?
-FIRST_NAME=Jonny
+R:FIRST_NAME=Jonny
 ---
 John Smith?
-FIRST_NAME=John
-LAST_NAME=Smith
+R:FIRST_NAME=John
+R:LAST_NAME=Smith
 ---
 Yes
 @positive

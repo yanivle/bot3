@@ -1,75 +1,58 @@
 Hi! Can I book a table for 7pm tomorrow for 5 people?
-PURPOSE=BOOK_RESERVATION
-PREFERRED_TIME=7pm
-DATE=tomorrow
-PARTY_SIZE=5
-#####@AVAILABILITY[DATE=tomorrow,TIME=7pm]=True
+R:PURPOSE=BOOK_RESERVATION
+R:PREFERRED_TIME=7pm
+R:DATE=tomorrow
+R:PARTY_SIZE=5
 ---
 For tomorrow at 7pm
-DATE=tomorrow
-PREFERRED_TIME=7pm
-#^AVAILABILITY[DATE=tomorrow,TIME=7pm]=True
-REQ(PURPOSE=BOOK_RESERVATION)
+R:DATE=tomorrow
+R:PREFERRED_TIME=7pm
 ---
 It's for tomorrow
-DATE=tomorrow
-REQ(PURPOSE=BOOK_RESERVATION)
+R:DATE=tomorrow
 ---
 It's for 7pm
-PREFERRED_TIME=7pm
-REQ(PURPOSE=BOOK_RESERVATION)
+R:PREFERRED_TIME=7pm
 ---
 Can you do 7:30pm?
-@AVAILABILITY[TIME=7:30pm]=True
-REQ(PURPOSE=BOOK_RESERVATION)
+@H:AVAILABILITY[TIME=7:30pm]=True
 ---
 Can you do 8pm?
-@AVAILABILITY[TIME=8pm]=True
-REQ(PURPOSE=BOOK_RESERVATION)
+@H:AVAILABILITY[TIME=8pm]=True
 ---
 I need a table for 5 people
-PARTY_SIZE=5
-REQ(PURPOSE=BOOK_RESERVATION)
+R:PARTY_SIZE=5
 ---
 The number is 2125655611
-PHONE_NUMBER=2125655611
-REQ(PURPOSE=BOOK_RESERVATION)
-#REQ(GROUP(AVAILABILITY[TIME=7pm]))
+R:PHONE_NUMBER=2125655611
 ---
 The last name is Leviathan
-LAST_NAME=Leviathan
-REQ(PURPOSE=BOOK_RESERVATION)
+R:LAST_NAME=Leviathan
 ---
 The first name is Yaniv
-FIRST_NAME=Yaniv
-REQ(PURPOSE=BOOK_RESERVATION)
+R:FIRST_NAME=Yaniv
 ---
 #Do you need the first name?
-#@*FIRST_NAME=*
+#@*R:FIRST_NAME=*
 #---
+So am I all set?
+# Is this the best way to do this?
+*AGREED_TIME=*
+---
 So am I all set for tomorrow at 7pm?
-DATE=tomorrow
+R:DATE=tomorrow
 @AGREED_TIME=7pm
-@CONFIRM=True
-REQ(DATE=tomorrow)
-REQ(PARTY_SIZE=5)
-REQ(PURPOSE=BOOK_RESERVATION)
-REQ(GROUP(AVAILABILITY[TIME=7pm]=True,PREFERRED_TIME=7pm))
-REQ(GROUP(FIRST_NAME=Yaniv,LAST_NAME=Leviathan,PHONE_NUMBER=2125655611))
 ---
 So am I all set for 7:30pm?
 @AGREED_TIME=7:30pm
-@CONFIRM=True
-REQ(PURPOSE=BOOK_RESERVATION)
-REQ(AVAILABILITY[TIME=7:30pm]=True)
+###REQ(H:AVAILABILITY[TIME=7:30pm]=True)
 ---
 So am I all set for 8pm?
 @AGREED_TIME=8pm
-@CONFIRM=True
-REQ(PURPOSE=BOOK_RESERVATION)
-REQ(AVAILABILITY[TIME=8pm]=True)
+#@H:CONFIRM=True
+###REQ(AVAILABILITY[TIME=8pm]=True)
 ---
 How long would the wait be?
-*ESTIMATED_WAIT=*
+*H:ESTIMATED_WAIT=*
 ---
 Hmm...
