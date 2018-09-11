@@ -48,29 +48,36 @@ class Statement(object):
         return True
 
 
+class GoalStatementType(Enum):
+    GROUP = 1
+    OR = 2
+
+
 @dataclass(frozen=True)
-class GoalGroupStatement(object):
+class GoalStatement(object):
     basics: List[Statement]
+    type: GoalStatementType
 
     @staticmethod
     def fromText(text):
         inner_text = peel('GROUP', text)
+        type = GoalStatementType.GROUP
         if not inner_text:
-            return GoalGroupStatement([Statement.fromText(text)])
+            inner_text = peel('OR', text)
+            type = GoalStatementType.OR
+        if not inner_text:
+            return GoalStatement([Statement.fromText(text)], GoalStatementType.GROUP)
         inner_text_parts = parse_list(inner_text)
         basics = sorted([Statement.fromText(part) for part in inner_text_parts])
         assert (x for x in basics), f'An inner part of {text} couldn\'t be parsed.'
-        return GoalGroupStatement(basics)
+        return GoalStatement(basics, type)
 
     @staticmethod
     def fromStatement(statement):
-        return GoalGroupStatement([statement])
-
-    def __lt__(self, other):
-        return self.basics < other.basics
+        return GoalStatement([statement])
 
     def clone(self):
-        return GoalGroupStatement([x.clone() for x in self.basics])
+        return GoalStatement([x.clone() for x in self.basics], self.type)
 
     def __len__(self):
         return len(self.basics)
@@ -79,22 +86,34 @@ class GoalGroupStatement(object):
         if len(self) == 1:
             return repr(self.basics[0])
         else:
-            return f"GROUP({', '.join(repr(s) for s in self.basics)})"
+            return f"{self.type.name}({', '.join(repr(s) for s in self.basics)})"
 
     def _key(self):
-        return tuple(self.basics)
+        return (self.type.value, tuple(self.basics))
+
+    def __lt__(self, other):
+        return self._key() < other._key()
 
     def __hash__(self):
         return hash(self._key())
 
-    def has_var(self, var):
-        return any(s.var == var for s in self.basics)
+    # TODO: remove this
+    # def has_var(self, var):
+    #     return any(s.var == var for s in self.basics)
 
     def contradictedByStatement(self, statement):
-        return any(basic.contradictedByStatement(statement) for basic in self.basics)
+        if self.type == GoalStatementType.GROUP:
+            return any(basic.contradictedByStatement(statement) for basic in self.basics)
+        elif self.type == GoalStatementType.OR:
+            return all(basic.contradictedByStatement(statement) for basic in self.basics)
+        raise RuntimeError()
 
     def satisfiedByStatement(self, statement):
-        return any(basic.satisfiedByStatement(statement) for basic in self.basics) and not self.contradictedByStatement(statement)
+        if self.type == GoalStatementType.GROUP:
+            return any(basic.satisfiedByStatement(statement) for basic in self.basics) and not self.contradictedByStatement(statement)
+        elif self.type == GoalStatementType.OR:
+            return any(basic.satisfiedByStatement(statement) for basic in self.basics)
+        raise RuntimeError()
 
     def contradictedByStatementList(self, statement_list):
         return any(self.contradictedByStatement(s) for s in statement_list.statements)
@@ -166,7 +185,7 @@ class GoalStatementList(StatementList):
         for line in text.split('\n'):
             if not line:
                 continue
-            statements.append(GoalGroupStatement.fromText(line))
+            statements.append(GoalStatement.fromText(line))
         return statements
 
     @staticmethod
@@ -175,7 +194,7 @@ class GoalStatementList(StatementList):
 
     @staticmethod
     def fromStatementList(statements):
-        return GoalStatementList([GoalGroupStatement.fromStatement(s) for s in statements.statements])
+        return GoalStatementList([GoalStatement.fromStatement(s) for s in statements.statements])
 
     def clone(self):
         return GoalStatementList([s.clone() for s in self.statements])
