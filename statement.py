@@ -68,13 +68,16 @@ class GoalStatement(object):
         if not inner_text:
             return GoalStatement([Statement.fromText(text)], GoalStatementType.GROUP)
         inner_text_parts = parse_list(inner_text)
-        basics = sorted([Statement.fromText(part) for part in inner_text_parts])
+        # BUG!!! Potentially big bug - not sorting to preserve the order from the goals file,
+        # but maybe this messes up some hashing or comparisons?
+        # basics = sorted([Statement.fromText(part) for part in inner_text_parts])
+        basics = [Statement.fromText(part) for part in inner_text_parts]
         assert (x for x in basics), f'An inner part of {text} couldn\'t be parsed.'
         return GoalStatement(basics, type)
 
     @staticmethod
     def fromStatement(statement):
-        return GoalStatement([statement])
+        return GoalStatement([statement], GoalStatementType.GROUP)
 
     def clone(self):
         return GoalStatement([x.clone() for x in self.basics], self.type)
@@ -183,6 +186,9 @@ class GoalStatementList(StatementList):
                 continue
             statements.append(GoalStatement.fromText(line))
         return statements
+
+    def __post_init__(self):
+        pass
 
     @staticmethod
     def fromText(text):
