@@ -80,7 +80,7 @@ class DialogGraph(object):
                     res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=10):
+    def bfs(self, goal, max_path_length=4):
         goal_statement = goal.firstUnsatisfiedStatement(self.start_vertex.state.statements)
         assert goal_statement
         res = []
@@ -136,16 +136,16 @@ def getNextUtt(state, robot_utts, human_utts, goals) -> Utt:
     dg = DialogGraph(robot_utts, human_utts, state)
     goal = getActiveGoal(state, goals)
     if goal.satisfiedByState(state):
-        print('*** All done! ***')
+        print(f'{colors.C("*** ALL DONE***", colors.HEADER)}')
         return robot_utts[-1]
-    print(f'Advancing towards {colors.C(goal.name, colors.HEADER)}')
+    # print(f'Advancing towards {colors.C(goal.name, colors.HEADER)}')
     # TODO: think about the following 2 lines (is this the right place for this? should we do this at all?):
     state.predictions = statement.StatementList()
     state.positive_predictions = statement.StatementList()
     paths = dg.bfs(goal)
-    print(f'Found total of {len(paths)} paths to goal.')
+    # print(f'Found total of {len(paths)} paths to goal.')
     if paths:
-        print('Selected path:', paths[0])
+        #print('Selected path:', paths[0])
         return paths[0].edges_and_vertices[1].edge.utt
-    print('No path found to goal :(')
+    #print('No path found to goal :(')
     return robot_utts[-1]
