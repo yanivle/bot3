@@ -15,6 +15,11 @@ class Goal(object):
     def __repr__(self):
         return f'Goal({self.name}): {self.statements}\n'
 
+    def firstUnsatisfiedStatement(self, statement_list):
+        for statement in self.statements.statements:
+            if not statement.satisfiedByStatementList(statement_list):
+                return statement
+
     def satisfiedByState(self, state):
         return self.statements.satisfiedByStatementList(state.statements)
 

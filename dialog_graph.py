@@ -81,6 +81,8 @@ class DialogGraph(object):
         return res
 
     def bfs(self, goal, max_path_length=10):
+        goal_statement = goal.firstUnsatisfiedStatement(self.start_vertex.state.statements)
+        assert goal_statement
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
         visited_count = 0
@@ -97,7 +99,8 @@ class DialogGraph(object):
                 if path.visited(neighbor.vertex):
                     # print('Already visited')
                     continue
-                elif goal.satisfiedByState(neighbor.vertex.state):
+                elif goal_statement.satisfiedByStatementList(neighbor.vertex.state.statements):
+                    # elif goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
                     max_path_length = len(path)
