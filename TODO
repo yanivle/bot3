@@ -1,5 +1,3 @@
-0. Add support for sub-goals: i.e. you have to satisfy part of the goal before satisfying another part
-
 1.think about verifies: NAME=JOHN how do we treat that?
 basically, some things if they are wrong, need correcting, others not
 
@@ -16,9 +14,6 @@ basically, some things if they are wrong, need correcting, others not
 -----
 
 Change response_logic to always prefer the single best goal (in the future this can be a list with ties).
-Change response_logic to actually simulate the conversation (bfs).
-Human side doesn't do anything, unless we have a target for the human.
-
 Each intent gets:
 statements (changes to the list)
 statements (add temporary goals to the other side)
