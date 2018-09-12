@@ -77,8 +77,12 @@ def runTests(state):
 
             goal = dialog_graph.getActiveGoal(state, goals)
 
-            robot_utt = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
+            possible_robot_utts = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
+            robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
             print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
+            if alternatives:
+                for alternative in alternatives:
+                    print(f'  Alt: {alternative.text}')
             state = robot_utt.applyToState(state)
 
 
@@ -92,8 +96,12 @@ def interactiveMode(state):
 
         goal = dialog_graph.getActiveGoal(state, goals)
 
-        robot_utt = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
+        possible_robot_utts = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
+        robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
         print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
+        if alternatives:
+            for alternative in alternatives:
+                print(f'  Alt: {alternative.text}')
         state = robot_utt.applyToState(state)
         # print(state)
 
@@ -107,5 +115,5 @@ def interactiveMode(state):
         #     print(f'  remaining: {diff_to_goal.remaining}')
 
 
-# runTests(initial_state)
-interactiveMode(initial_state)
+runTests(initial_state)
+# interactiveMode(initial_state)

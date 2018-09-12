@@ -89,6 +89,8 @@ class DialogGraph(object):
         while queue:
             visited_count += 1
             (vertex, path) = queue.pop(0)
+            if len(path) > max_path_length:
+                break
             # print('Path:', path)
             # print(f'Visited {visited_count} nodes.')
             neighbors = self.neighbors(vertex)
@@ -132,7 +134,7 @@ def getNextUtt(state, robot_utts, human_utts, goals) -> Utt:
     goal = getActiveGoal(state, goals)
     if goal.satisfiedByState(state):
         print(f'{colors.C("*** ALL DONE***", colors.HEADER)}')
-        return robot_utts[-1]
+        return [robot_utts[-1]]
     # print(f'Advancing towards {colors.C(goal.name, colors.HEADER)}')
     # TODO: think about the following 2 lines (is this the right place for this? should we do this at all?):
     state.predictions = statement.StatementList()
@@ -141,6 +143,11 @@ def getNextUtt(state, robot_utts, human_utts, goals) -> Utt:
     # print(f'Found total of {len(paths)} paths to goal.')
     if paths:
         #print('Selected path:', paths[0])
-        return paths[0].edges_and_vertices[1].edge.utt
+        # BUG: Something is very weird with the lengths of the paths...
+        # Debug this - I was expecting them to be 1 when we're 1 away from winning,
+        # but sometimes they are long.
+        # for path in paths:
+        #     print (len(path), path.edges_and_vertices[1].edge.utt)
+        return [path.edges_and_vertices[1].edge.utt for path in paths]
     #print('No path found to goal :(')
-    return robot_utts[-1]
+    return [robot_utts[-1]]
