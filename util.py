@@ -23,4 +23,6 @@ def peel_lines(pattern, lines):
 
 
 def parse_list(s):
-    return [x.strip() for x in s.split(',')]
+    assert not ',,,' in s, 'Only 2 levels of nesting supported'
+    separator = ',,' if ',,' in s else ','
+    return [x.strip() for x in s.split(separator)]
