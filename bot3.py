@@ -84,7 +84,7 @@ def runTests(state):
 
 def interactiveMode(state):
     while True:
-        human_utt = getHumanUttFreeform(BASIC_FLOW)
+        human_utt = getHumanUttFreeform()
 
         state = human_utt.applyToState(state)
         print(colors.C(human_utt.text, colors.OKBLUE))
@@ -107,4 +107,5 @@ def interactiveMode(state):
         #     print(f'  remaining: {diff_to_goal.remaining}')
 
 
-runTests(initial_state)
+# runTests(initial_state)
+interactiveMode(initial_state)
