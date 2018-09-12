@@ -34,7 +34,7 @@ class Statement(object):
             return True
         if self.var != other.var:  # Different vars.
             return None
-        if self.value == other.value or self.value == '*':  # Same vars, compatible values.
+        if self.value == other.value or self.value == '*' or other.value == '*':  # Same vars, compatible values.
             return True
         return False  # Same vars, incompatible values.
 
@@ -70,6 +70,7 @@ class Statement(object):
 class GoalStatementType(Enum):
     GROUP = 1
     OR = 2
+    AND = 3
 
 
 @dataclass(frozen=True)
@@ -85,12 +86,15 @@ class GoalStatement(object):
             inner_text = peel('OR', text)
             type = GoalStatementType.OR
         if not inner_text:
+            inner_text = peel('AND', text)
+            type = GoalStatementType.AND
+        if not inner_text:
             return GoalStatement([Statement.fromText(text)], GoalStatementType.GROUP)
         inner_text_parts = parse_list(inner_text)
         # BUG!!! Potentially big bug - not sorting to preserve the order from the goals file,
         # but maybe this messes up some hashing or comparisons?
         # basics = sorted([Statement.fromText(part) for part in inner_text_parts])
-        basics = [Statement.fromText(part) for part in inner_text_parts]
+        basics = [GoalStatement.fromText(part) for part in inner_text_parts]
         assert (x for x in basics), f'An inner part of {text} couldn\'t be parsed.'
         return GoalStatement(basics, type)
 
@@ -124,6 +128,8 @@ class GoalStatement(object):
             return any(basic.falseGivenStatementList(statement_list) for basic in self.basics)
         elif self.type == GoalStatementType.OR:
             return any(basic.falseGivenStatementList(statement_list) for basic in self.basics) and not self.trueGivenStatementList(statement_list)
+        elif self.type == GoalStatementType.AND:
+            return any(basic.falseGivenStatementList(statement_list) for basic in self.basics)
         raise RuntimeError()
 
     def trueGivenStatementList(self, statement_list):
@@ -131,6 +137,8 @@ class GoalStatement(object):
             return any(basic.trueGivenStatementList(statement_list) for basic in self.basics) and not self.falseGivenStatementList(statement_list)
         if self.type == GoalStatementType.OR:
             return any(basic.trueGivenStatementList(statement_list) for basic in self.basics)
+        if self.type == GoalStatementType.AND:
+            return any(basic.trueGivenStatementList(statement_list) for basic in self.basics) and not self.falseGivenStatementList(statement_list)
         raise RuntimeError()
 
     def canBeTrueGivenStatementList(self, statement_list):
@@ -138,6 +146,8 @@ class GoalStatement(object):
             return all(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
         if self.type == GoalStatementType.OR:
             return any(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
+        if self.type == GoalStatementType.AND:
+            return all(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
         raise RuntimeError()
 
 
