@@ -61,7 +61,8 @@ def runTests(state):
         'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True'], ['R:DATE=today'], [], ['@positive']],
         'NO_RESERVATIONS': [[], ['H:RESERVATIONS_ACCEPTED=False'], ['H:ESTIMATED_WAIT=short']],
         'NO_RESERVATIONS_FOR_7pm': [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=7:30pm']],
-        'NO_RESERVATIONS_FOR_7pm_and_730pm': [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False', 'H:RESERVATIONS_ACCEPTED[TIME=7:30pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=8pm']]
+        'NO_RESERVATIONS_FOR_7pm_and_730pm': [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False', 'H:RESERVATIONS_ACCEPTED[TIME=7:30pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=8pm']],
+        'VERIFY_WRONG_DETAILS_SIMULTANEOUSLY': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', 'R:DATE=today'], [], [], ['@positive']],
     }
 
     for test_name, test in tests.items():
