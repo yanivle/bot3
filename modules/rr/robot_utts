@@ -4,6 +4,12 @@ R:PREFERRED_TIME=7pm
 R:DATE=tomorrow
 R:PARTY_SIZE=5
 ---
+Do you need the name then?
+@H:BUSINESS_NEEDS_NAME=True
+---
+Do you need the phone then?
+@H:BUSINESS_NEEDS_PHONE=True
+---
 For tomorrow at 7pm
 R:DATE=tomorrow
 R:PREFERRED_TIME=7pm
@@ -25,18 +31,17 @@ R:PARTY_SIZE=5
 ---
 The number is 2125655611
 R:PHONE_NUMBER=2125655611
+REQ(H:BUSINESS_NEEDS_PHONE=True)
 ---
 The last name is Leviathan
 R:LAST_NAME=Leviathan
+REQ(H:BUSINESS_NEEDS_NAME=True)
 ---
 The first name is Yaniv
 R:FIRST_NAME=Yaniv
+REQ(H:BUSINESS_NEEDS_NAME=True)
 ---
-#Do you need the first name?
-#@*R:FIRST_NAME=*
-#---
 So am I all set?
-# Is this the best way to do this?
 *AGREED_TIME=*
 ---
 So am I all set for tomorrow at 7pm?

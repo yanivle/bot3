@@ -46,12 +46,15 @@ H:AVAILABILITY[TIME=8pm]=False
 ---
 What's the first name?
 *R:FIRST_NAME=*
+H:BUSINESS_NEEDS_NAME=True
 ---
 What's the last name?
 *R:LAST_NAME=*
+H:BUSINESS_NEEDS_NAME=True
 ---
 Can I have the phone number please?
 *R:PHONE_NUMBER=*
+H:BUSINESS_NEEDS_PHONE=True
 ---
 You are all set
 H:CONFIRM=True
