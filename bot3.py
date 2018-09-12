@@ -67,7 +67,7 @@ def runTests(state):
     }
 
     for test_name, test in tests.items():
-        print(f'Test: {colors.C(test_name, colors.FAIL)} - resetting state')
+        print(f'Test: {colors.C(test_name, colors.FAIL)}')
         state = initial_state.clone()
         while test:
             human_utt = getHumanUttFromTest(test)
@@ -115,4 +115,4 @@ def interactiveMode(state):
 
 
 runTests(initial_state)
-# interactiveMode(initial_state)
+interactiveMode(initial_state)
