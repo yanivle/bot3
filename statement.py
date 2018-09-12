@@ -27,25 +27,44 @@ class Statement(object):
     def __repr__(self):
         return f'{self.var}={self.value}'
 
-    def satisfiedByStatement(self, other):
-        if self.var == '1' and self.value == '1':
+    def evaluate(self, other):
+        '''Evaluates self given other.
+        Returns True, False, or None (if unknown).'''
+        if self.var == '1' and self.value == '1':  # Always True.
             return True
-        if self.var != other.var:
-            return False
-        if self.value == other.value or (self.value == '*' and other.value != '?'):
+        if self.var != other.var:  # Different vars.
+            return None
+        if self.value == other.value or self.value == '*':  # Same vars, compatible values.
+            return True
+        return False  # Same vars, incompatible values.
+
+    def trueGivenStatement(self, other):
+        return self.evaluate(other) == True
+
+    def falseGivenStatement(self, other):
+        return self.evaluate(other) == False
+
+    def unknownGivenStatement(self, other):
+        return self.evaluate(other) == None
+
+    def fixableVar(self):
+        return self.var.startswith('R:')
+
+    def canBeTrueGivenStatement(self, other):
+        return self.trueGivenStatement(other) or self.unknownGivenStatement(other) or self.fixableVar()
+
+    def falseGivenStatementList(self, statement_list):
+        return any(self.falseGivenStatement(s) for s in statement_list.statements)
+
+    def trueGivenStatementList(self, statement_list):
+        if any(self.trueGivenStatement(s) for s in statement_list.statements):
+            # This assert would catch an inconsistent statement_list (one statement makes this True and another False).
+            assert not self.falseGivenStatementList(statement_list)
             return True
         return False
 
-    def contradictedByStatement(self, other):
-        if self.var == '1' and self.value == '1':
-            return False
-        # TODO: should I assert this instead of supporting?
-        # assert other.value != '*'
-        if self.var != other.var:
-            return False
-        if self.value == other.value or self.value == '*' or other.value == '*':
-            return False
-        return True
+    def canBeTrueGivenStatementList(self, statement_list):
+        return all(self.canBeTrueGivenStatement(s) for s in statement_list.statements)
 
 
 class GoalStatementType(Enum):
@@ -100,25 +119,26 @@ class GoalStatement(object):
     def __hash__(self):
         return hash(self._key())
 
-    def contradictedByStatement(self, statement):
+    def falseGivenStatementList(self, statement_list):
         if self.type == GoalStatementType.GROUP:
-            return any(basic.contradictedByStatement(statement) for basic in self.basics)
+            return any(basic.falseGivenStatementList(statement_list) for basic in self.basics)
         elif self.type == GoalStatementType.OR:
-            return all(basic.contradictedByStatement(statement) for basic in self.basics)
+            return any(basic.falseGivenStatementList(statement_list) for basic in self.basics) and not self.trueGivenStatementList(statement_list)
         raise RuntimeError()
 
-    def satisfiedByStatement(self, statement):
+    def trueGivenStatementList(self, statement_list):
         if self.type == GoalStatementType.GROUP:
-            return any(basic.satisfiedByStatement(statement) for basic in self.basics) and not self.contradictedByStatement(statement)
-        elif self.type == GoalStatementType.OR:
-            return any(basic.satisfiedByStatement(statement) for basic in self.basics)
+            return any(basic.trueGivenStatementList(statement_list) for basic in self.basics) and not self.falseGivenStatementList(statement_list)
+        if self.type == GoalStatementType.OR:
+            return any(basic.trueGivenStatementList(statement_list) for basic in self.basics)
         raise RuntimeError()
 
-    def contradictedByStatementList(self, statement_list):
-        return any(self.contradictedByStatement(s) for s in statement_list.statements)
-
-    def satisfiedByStatementList(self, statement_list):
-        return any(self.satisfiedByStatement(s) for s in statement_list.statements) and not self.contradictedByStatementList(statement_list)
+    def canBeTrueGivenStatementList(self, statement_list):
+        if self.type == GoalStatementType.GROUP:
+            return all(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
+        if self.type == GoalStatementType.OR:
+            return any(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
+        raise RuntimeError()
 
 
 @dataclass
@@ -201,11 +221,14 @@ class GoalStatementList(StatementList):
     def clone(self):
         return GoalStatementList([s.clone() for s in self.statements])
 
-    def contradictedByStatementList(self, statement_list):
-        return any(s.contradictedByStatementList(statement_list) for s in self.statements)
+    def falseGivenStatementList(self, statement_list):
+        return any(s.falseGivenStatementList(statement_list) for s in self.statements)
 
-    def satisfiedByStatementList(self, statement_list):
-        return all(s.satisfiedByStatementList(statement_list) for s in self.statements)
+    def trueGivenStatementList(self, statement_list):
+        return all(s.trueGivenStatementList(statement_list) for s in self.statements)
+
+    def canBeTrueGivenStatementList(self, statement_list):
+        return all(s.canBeTrueGivenStatementList(statement_list) for s in self.statements)
 
     def __hash__(self):
         return hash(self._key())

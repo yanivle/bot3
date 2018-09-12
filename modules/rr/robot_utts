@@ -41,16 +41,17 @@ So am I all set?
 ---
 So am I all set for tomorrow at 7pm?
 R:DATE=tomorrow
+REQ(R:DATE=tomorrow)
+REQ(R:PREFERRED_TIME=7pm)
 @AGREED_TIME=7pm
 ---
 So am I all set for 7:30pm?
+REQ(H:AVAILABILITY[TIME=7:30pm]=True)
 @AGREED_TIME=7:30pm
-###REQ(H:AVAILABILITY[TIME=7:30pm]=True)
 ---
 So am I all set for 8pm?
+REQ(AVAILABILITY[TIME=8pm]=True)
 @AGREED_TIME=8pm
-#@H:CONFIRM=True
-###REQ(AVAILABILITY[TIME=8pm]=True)
 ---
 How long would the wait be?
 *H:ESTIMATED_WAIT=*

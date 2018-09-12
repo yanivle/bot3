@@ -99,13 +99,13 @@ class DialogGraph(object):
                 if path.visited(neighbor.vertex):
                     # print('Already visited')
                     continue
-                elif goal_statement.satisfiedByStatementList(neighbor.vertex.state.statements):
+                elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
                     # elif goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
                     max_path_length = len(path)
                 elif len(path) < max_path_length:
-                    if not goal.contradictedByState(neighbor.vertex.state):
+                    if not goal.falseGivenState(neighbor.vertex.state):
                         # print('Will explore.')
                         queue.append((neighbor.vertex, path + neighbor))
                     else:
@@ -123,12 +123,7 @@ def getActiveGoal(state, goals):
             'Interest', statement.GoalStatementList.fromStatementList(state.predictions))
         return new_goal
     for goal in goals:
-        # print(f'Trying: {goal.name}')
-        if goal.contradictedByState(state):
-            # print(f'{goal.name} contradicted - skipping')
-            continue
-        else:
-            # print(f'{goal.name} selected')
+        if goal.canBeTrueGivenState(state):
             return goal
 
 

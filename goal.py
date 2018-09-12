@@ -17,14 +17,17 @@ class Goal(object):
 
     def firstUnsatisfiedStatement(self, statement_list):
         for statement in self.statements.statements:
-            if not statement.satisfiedByStatementList(statement_list):
+            if not statement.trueGivenStatementList(statement_list):
                 return statement
 
     def satisfiedByState(self, state):
-        return self.statements.satisfiedByStatementList(state.statements)
+        return self.statements.trueGivenStatementList(state.statements)
 
-    def contradictedByState(self, state):
-        return self.statements.contradictedByStatementList(state.statements)
+    def canBeTrueGivenState(self, state):
+        return self.statements.canBeTrueGivenStatementList(state.statements)
+
+    def falseGivenState(self, state):
+        return self.statements.falseGivenStatementList(state.statements)
 
     def clone(self):
         return Goal(self.name, self.statements.clone())

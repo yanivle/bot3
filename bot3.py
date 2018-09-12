@@ -56,14 +56,14 @@ def getHumanUtt():
 
 def runTests(state):
     BASIC_FLOW = [[], [], [], ['@positive']]
-    ASK_FOR_DETAILS = [[], ['*R:DATE=*', 'R:DATE=?'],
-                       ['*R:FIRST_NAME=*', 'R:FIRST_NAME=?'], [], ['@positive']]
+    ASK_FOR_DETAILS = [[], ['R:DATE=?'], ['R:FIRST_NAME=?'], [], ['@positive']]
+    VERIFY_WRONG_DETAILS = [[], ['R:FIRST_NAME=John'], ['R:DATE=today'], [], ['@positive']]
     NO_RESERVATIONS_FLOW = [[], ['H:RESERVATIONS_ACCEPTED=False'], ['H:ESTIMATED_WAIT=short']]
     NO_RESERVATIONS_FOR_7pm = [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False'], [
         '@positive'], [], ['AGREED_TIME=7:30pm']]
     NO_RESERVATIONS_FOR_7pm_and_730pm = [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False', 'H:RESERVATIONS_ACCEPTED[TIME=7:30pm]=False'], [
         '@positive'], [], ['AGREED_TIME=8pm']]
-    tests = [BASIC_FLOW, ASK_FOR_DETAILS, NO_RESERVATIONS_FLOW,
+    tests = [BASIC_FLOW, ASK_FOR_DETAILS, VERIFY_WRONG_DETAILS, NO_RESERVATIONS_FLOW,
              NO_RESERVATIONS_FOR_7pm, NO_RESERVATIONS_FOR_7pm_and_730pm]
     for test in tests:
         print(colors.C(f'Resetting state', colors.FAIL))

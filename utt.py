@@ -40,7 +40,7 @@ class Utt(object):
         return state
 
     def requirementsMet(self, state):
-        return self.requirements.satisfiedByStatementList(state.statements)
+        return self.requirements.trueGivenStatementList(state.statements)
 
 
 parseUttSpec = block_parser.createBlockSpecParser(Utt.fromText)
