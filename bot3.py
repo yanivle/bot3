@@ -55,18 +55,17 @@ def getHumanUtt():
 
 
 def runTests(state):
-    BASIC_FLOW = [[], [], [], ['@positive']]
-    ASK_FOR_DETAILS = [[], ['R:DATE=?'], ['R:FIRST_NAME=?'], [], ['@positive']]
-    VERIFY_WRONG_DETAILS = [[], ['R:FIRST_NAME=John'], ['R:DATE=today'], [], ['@positive']]
-    NO_RESERVATIONS_FLOW = [[], ['H:RESERVATIONS_ACCEPTED=False'], ['H:ESTIMATED_WAIT=short']]
-    NO_RESERVATIONS_FOR_7pm = [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False'], [
-        '@positive'], [], ['AGREED_TIME=7:30pm']]
-    NO_RESERVATIONS_FOR_7pm_and_730pm = [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False', 'H:RESERVATIONS_ACCEPTED[TIME=7:30pm]=False'], [
-        '@positive'], [], ['AGREED_TIME=8pm']]
-    tests = [BASIC_FLOW, ASK_FOR_DETAILS, VERIFY_WRONG_DETAILS, NO_RESERVATIONS_FLOW,
-             NO_RESERVATIONS_FOR_7pm, NO_RESERVATIONS_FOR_7pm_and_730pm]
-    for test in tests:
-        print(colors.C(f'Resetting state', colors.FAIL))
+    tests = {
+        'BASIC': [[], [], ['@positive'], [], ['@positive']],
+        'ASK_FOR_DETAILS': [[], ['R:DATE=?'], ['R:FIRST_NAME=?', 'H:BUSINESS_NEEDS_NAME=True'], [], ['@positive']],
+        'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True'], ['R:DATE=today'], [], ['@positive']],
+        'NO_RESERVATIONS': [[], ['H:RESERVATIONS_ACCEPTED=False'], ['H:ESTIMATED_WAIT=short']],
+        'NO_RESERVATIONS_FOR_7pm': [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=7:30pm']],
+        'NO_RESERVATIONS_FOR_7pm_and_730pm': [[], ['H:RESERVATIONS_ACCEPTED[TIME=7pm]=False', 'H:RESERVATIONS_ACCEPTED[TIME=7:30pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=8pm']]
+    }
+
+    for test_name, test in tests.items():
+        print(f'Test: {colors.C(test_name, colors.FAIL)} - resetting state')
         state = initial_state.clone()
         while test:
             human_utt = getHumanUttFromTest(test)
@@ -80,9 +79,8 @@ def runTests(state):
             possible_robot_utts = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
             robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
             print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
-            if alternatives:
-                for alternative in alternatives:
-                    print(f'  Alt: {alternative.text}')
+            for alternative in set(alternatives) - {robot_utt}:
+                print(f'  Alt: {alternative.text}')
             state = robot_utt.applyToState(state)
 
 
@@ -99,9 +97,8 @@ def interactiveMode(state):
         possible_robot_utts = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
         robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
         print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
-        if alternatives:
-            for alternative in alternatives:
-                print(f'  Alt: {alternative.text}')
+        for alternative in set(alternatives) - {robot_utt}:
+            print(f'  Alt: {alternative.text}')
         state = robot_utt.applyToState(state)
         # print(state)
 
