@@ -4,10 +4,10 @@ R:PREFERRED_TIME=7pm
 R:DATE=tomorrow
 R:PARTY_SIZE=5
 ---
-Do you need the name then?
+Do you need the name?
 @H:BUSINESS_NEEDS_NAME=True
 ---
-Do you need the phone then?
+Do you need the phone?
 @H:BUSINESS_NEEDS_PHONE=True
 ---
 For tomorrow at 7pm
@@ -42,7 +42,7 @@ R:FIRST_NAME=Yaniv
 REQ(H:BUSINESS_NEEDS_NAME=True)
 ---
 So am I all set?
-*AGREED_TIME=*
+@AGREED_TIME=*
 ---
 So am I all set for tomorrow at 7pm?
 R:DATE=tomorrow
@@ -60,5 +60,10 @@ REQ(AVAILABILITY[TIME=8pm]=True)
 ---
 How long would the wait be?
 *H:ESTIMATED_WAIT=*
+---
+To make sure, you don't have availability at all between 7pm and 8pm?
+@H:AVAILABILITY[TIME=7pm]=False
+@H:AVAILABILITY[TIME=7:30pm]=False
+@H:AVAILABILITY[TIME=8pm]=False
 ---
 Hmm...
