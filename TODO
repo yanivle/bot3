@@ -1,3 +1,15 @@
+Translation from BG Duplex
+1. AskForX
+*X=*
+X=?
+Note: usually X would be R:X
+2. VerifyX(X=y)
+*X=*
+@X=y
+3. SuggestTime(time=t)
+AVAILABILITY[TIME=t]
+
+
 2.this about interests - if interested by something we already gave, how do we model this?
 - possible solution: everytime I do *A=B also do A=?
 - also: if state has A=B, and adding A=C, instead set A=? (note that this depends on #1 above - do that first)
