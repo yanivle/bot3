@@ -66,4 +66,7 @@ To make sure, you don't have availability at all between 7pm and 8pm?
 @H:AVAILABILITY[TIME=7:30pm]=False
 @H:AVAILABILITY[TIME=8pm]=False
 ---
+Yes
+@positive
+---
 Hmm...

@@ -57,13 +57,14 @@ def getHumanUtt():
 def runTests(state):
     tests = {
         'BASIC': [[], [], ['@positive'], [], ['@positive']],
-        'ASK_FOR_DETAILS': [[], ['R:DATE=?'], ['R:FIRST_NAME=?', 'H:BUSINESS_NEEDS_NAME=True'], [], ['@positive']],
+        'ASK_FOR_DETAILS': [[], ['R:DATE=?', '*R:DATE=*'], ['R:FIRST_NAME=?', 'H:BUSINESS_NEEDS_NAME=True', '*R:FIRST_NAME=*'], [], ['@positive']],
         'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True'], ['R:DATE=today'], [], ['@positive']],
         'NO_RESERVATIONS': [[], ['H:AVAILABILITY=False'], ['H:ESTIMATED_WAIT=short']],
         'NO_RESERVATIONS_FOR_7pm': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=7:30pm']],
         'NO_RESERVATIONS_FOR_7pm_AND_730pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=8pm']],
         'NO_RESERVATIONS_FOR_7pm_AND_730pm_AND_8pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['H:AVAILABILITY[TIME=8pm]=False'], ['H:ESTIMATED_WAIT=long']],
         'VERIFY_WRONG_DETAILS_SIMULTANEOUSLY': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', 'R:DATE=today'], ['R:DATE=tomorrow'], [], ['@positive']],
+        'SAYING_YES': [[], ['*R:FIRST_NAME=*', '@R:FIRST_NAME=Yaniv', 'H:BUSINESS_NEEDS_NAME=True']],
     }
 
     for test_name, test in tests.items():
@@ -75,8 +76,6 @@ def runTests(state):
             state = human_utt.applyToState(state)
             # print(colors.C(human_utt.text, colors.OKBLUE))
             # print(state)
-
-            goal = dialog_graph.getActiveGoal(state, goals)
 
             possible_robot_utts = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
             robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
@@ -93,8 +92,6 @@ def interactiveMode(state):
         state = human_utt.applyToState(state)
         print(colors.C(human_utt.text, colors.OKBLUE))
         # print(state)
-
-        goal = dialog_graph.getActiveGoal(state, goals)
 
         possible_robot_utts = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
         robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
