@@ -1,3 +1,22 @@
+Add support for proper debugging (allowing to specify the robot/human intent at any point).
+Fix tests (so they remember the replies and say "PASS" "FAIL" instead of having to re-read).
+
+Solve the randomness between candidates, if it's there (e.g. by sorting).
+
+Think about where to have values of R: variables (currently they are in the goal, think about this).
+
+Add support for rendering logic
+
+Simple support for sorry - revert to the previous state (without predictions) and try to find an intent that recreates the diff as well as possible
+
+How to support variable dependencies?
+
+Probs - try simple support? Ie true if > 0.75
+
+
+----
+
+
 Translation from BG Duplex
 1. AskForX
 *X=*
