@@ -69,6 +69,7 @@ def runTests(state):
         'NO_RESERVATIONS_FOR_7pm_AND_730pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=8pm']],
         'NO_RESERVATIONS_FOR_7pm_AND_730pm_AND_8pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['H:AVAILABILITY[TIME=8pm]=False'], ['H:ESTIMATED_WAIT=long']],
         'VERIFY_WRONG_DETAILS_SIMULTANEOUSLY': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', 'R:DATE=today', '*R:FIRST_NAME=*', '*R:DATE=*'], ['R:DATE=tomorrow'], [], ['@positive']],
+        'SAYING_YES': [[], ['*R:FIRST_NAME=*', '@R:FIRST_NAME=Yaniv', 'H:BUSINESS_NEEDS_NAME=True']],
     }
 
     for test_name, test in tests.items():
