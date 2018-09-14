@@ -34,7 +34,8 @@ class Statement(object):
             return True
         if self.var != other.var:  # Different vars.
             return None
-        if self.value == other.value or self.value == '*' or other.value == '*':  # Same vars, compatible values.
+        # Same vars, compatible values.
+        if self.value == other.value or (self.value == '*' and other.value != '?') or (other.value == '*' and self.value != '?'):
             return True
         return False  # Same vars, incompatible values.
 
