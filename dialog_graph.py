@@ -11,9 +11,10 @@ import statement
 @dataclass(frozen=True)
 class Vertex(object):
     state: State
+    robot_turn: bool
 
     def __repr__(self):
-        return f'{self.state}'
+        return f'({self.state}, robot_turn={robot_turn})'
 
 
 @dataclass(frozen=True)
@@ -60,24 +61,26 @@ class DialogGraph(object):
     def __init__(self, robot_utts, human_utts, initial_state):
         self.robot_utts = robot_utts
         self.human_utts = human_utts
-        self.start_vertex = Vertex(initial_state)
+        self.start_vertex = Vertex(initial_state, True)
 
     def neighbors(self, vertex):
         res = set()
-        if vertex.state.allPredictionStatements():
-            new_state = vertex.state.clone()
-            for prediction in vertex.state.allPredictionStatements():
-                new_state.statements.update(prediction)
-            new_state.predictions = statement.StatementList()
-            new_state.positive_predictions = statement.StatementList()
-            ev = EdgeAndVertex(Edge(None), Vertex(new_state))
-            res.add(ev)
-        else:
+        if vertex.robot_turn:
             for utt in self.robot_utts:
                 if utt.requirementsMet(vertex.state):
                     new_state = utt.applyToState(vertex.state)
-                    ev = EdgeAndVertex(Edge(utt), Vertex(new_state))
+                    ev = EdgeAndVertex(Edge(utt), Vertex(new_state, not vertex.robot_turn))
                     res.add(ev)
+        # Human turn - apply predictions (for now applying all together - we might want to generate separate neighbors).
+        else:
+            if vertex.state.allPredictionStatements():
+                new_state = vertex.state.clone()
+                for prediction in vertex.state.allPredictionStatements():
+                    new_state.statements.update(prediction)
+                new_state.predictions = statement.StatementList()
+                new_state.positive_predictions = statement.StatementList()
+                ev = EdgeAndVertex(Edge(None), Vertex(new_state, not vertex.robot_turn))
+                res.add(ev)
         return res
 
     def bfs(self, goal, max_path_length=4):
@@ -130,6 +133,7 @@ def getActiveGoal(state, goals):
 
 
 def getNextUtt(state, robot_utts, human_utts, goals) -> Utt:
+    # print('Start state:', state)
     dg = DialogGraph(robot_utts, human_utts, state)
     goal = getActiveGoal(state, goals)
     if goal.satisfiedByState(state):
