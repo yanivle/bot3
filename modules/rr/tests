@@ -1,0 +1,106 @@
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> []
+Do you need the phone?
+  Alt: Do you need the name?
+>>> ['@positive']
+The number is 2125655611
+>>> []
+So am I all set for tomorrow at 7pm?
+  Alt: So am I all set?
+>>> ['@positive']
+*** ALL DONE***
+Hmm...
+Test: ASK_FOR_DETAILS
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> ['R:DATE=?', '*R:DATE=*']
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+  Alt: It's for tomorrow
+  Alt: For tomorrow at 7pm
+>>> ['R:FIRST_NAME=?', 'H:BUSINESS_NEEDS_NAME=True', '*R:FIRST_NAME=*']
+The first name is Yaniv
+>>> []
+So am I all set?
+  Alt: So am I all set for tomorrow at 7pm?
+>>> ['@positive']
+*** ALL DONE***
+Hmm...
+Test: VERIFY_WRONG_DETAILS
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', '*R:FIRST_NAME=*']
+*** ALL DONE***
+Hmm...
+>>> ['R:DATE=today']
+For tomorrow at 7pm
+  Alt: It's for tomorrow
+  Alt: Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> []
+The first name is Yaniv
+>>> ['@positive']
+So am I all set?
+  Alt: So am I all set for tomorrow at 7pm?
+Test: NO_RESERVATIONS
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> ['H:AVAILABILITY=False']
+How long would the wait be?
+>>> ['H:ESTIMATED_WAIT=short']
+*** ALL DONE***
+Hmm...
+Test: NO_RESERVATIONS_FOR_7pm
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> ['H:AVAILABILITY[TIME=7pm]=False']
+Can you do 7:30pm?
+>>> ['@positive']
+Do you need the phone?
+  Alt: Do you need the name?
+>>> ['@positive']
+The number is 2125655611
+>>> ['AGREED_TIME=7:30pm']
+*** ALL DONE***
+Hmm...
+Test: NO_RESERVATIONS_FOR_7pm_AND_730pm
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False']
+Can you do 8pm?
+>>> ['@positive']
+Do you need the phone?
+  Alt: Do you need the name?
+>>> ['@positive']
+The number is 2125655611
+>>> ['AGREED_TIME=8pm']
+*** ALL DONE***
+Hmm...
+Test: NO_RESERVATIONS_FOR_7pm_AND_730pm_AND_8pm
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False']
+Can you do 8pm?
+>>> ['H:AVAILABILITY[TIME=8pm]=False']
+How long would the wait be?
+>>> ['H:ESTIMATED_WAIT=long']
+*** ALL DONE***
+Hmm...
+Test: VERIFY_WRONG_DETAILS_SIMULTANEOUSLY
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', 'R:DATE=today', '*R:FIRST_NAME=*', '*R:DATE=*']
+*** ALL DONE***
+Hmm...
+>>> ['R:DATE=tomorrow']
+The first name is Yaniv
+>>> []
+So am I all set?
+  Alt: So am I all set for tomorrow at 7pm?
+>>> ['@positive']
+*** ALL DONE***
+Hmm...
+Test: SAYING_YES
+>>> []
+Hi! Can I book a table for 7pm tomorrow for 5 people?
+>>> ['*R:FIRST_NAME=*', '@R:FIRST_NAME=Yaniv', 'H:BUSINESS_NEEDS_NAME=True']
+The first name is Yaniv

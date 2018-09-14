@@ -22,6 +22,22 @@ def peel_lines(pattern, lines):
     return res
 
 
+def divide_lines_by_prefix(lines, prefixes):
+    res = {}
+    for prefix in prefixes:
+        res[prefix] = []
+    res[None] = []
+    for line in lines:
+        found_prefix = False
+        for prefix in prefixes:
+            if line.startswith(prefix):
+                res[prefix].append(line)
+                found_prefix = True
+                break
+        if not found_prefix:
+            res[None].append(line)
+    return res
+
 def parse_list(s):
     assert not ',,,' in s, 'Only 2 levels of nesting supported'
     separator = ',,' if ',,' in s else ','
