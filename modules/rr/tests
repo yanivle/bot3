@@ -1,17 +1,15 @@
+TEST:Basic
 >>> []
-Hi! Can I book a table for 7pm tomorrow for 5 people?
+<<< Hi! Can I book a table for 7pm tomorrow for 5 people?
 >>> []
-Do you need the phone?
-  Alt: Do you need the name?
+<<< Do you need the phone?
 >>> ['@positive']
-The number is 2125655611
+<<< The number is 2125655611
 >>> []
-So am I all set for tomorrow at 7pm?
-  Alt: So am I all set?
+<<< So am I all set for tomorrow at 7pm?
 >>> ['@positive']
-*** ALL DONE***
-Hmm...
-Test: ASK_FOR_DETAILS
+---
+TEST: ASK_FOR_DETAILS
 >>> []
 Hi! Can I book a table for 7pm tomorrow for 5 people?
 >>> ['R:DATE=?', '*R:DATE=*']
