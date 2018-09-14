@@ -58,13 +58,17 @@ def runTests(state):
     tests = {
         'BASIC': [[], [], ['@positive'], [], ['@positive']],
         'ASK_FOR_DETAILS': [[], ['R:DATE=?', '*R:DATE=*'], ['R:FIRST_NAME=?', 'H:BUSINESS_NEEDS_NAME=True', '*R:FIRST_NAME=*'], [], ['@positive']],
-        'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True'], ['R:DATE=today'], [], ['@positive']],
+        # BUG: the below line (and others) don't work:
+        # The temporary goal, of getting *any* value for FIRST_NAME is immediately
+        # satisfied.
+        # We should probably change the syntax of prediction to instead be focus
+        # and just boost the value of that variable from the goal (and if it's not in the goal, go to previous goals until we find it?)
+        'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', '*R:FIRST_NAME=*'], ['R:DATE=today'], [], ['@positive']],
         'NO_RESERVATIONS': [[], ['H:AVAILABILITY=False'], ['H:ESTIMATED_WAIT=short']],
         'NO_RESERVATIONS_FOR_7pm': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=7:30pm']],
         'NO_RESERVATIONS_FOR_7pm_AND_730pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=8pm']],
         'NO_RESERVATIONS_FOR_7pm_AND_730pm_AND_8pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['H:AVAILABILITY[TIME=8pm]=False'], ['H:ESTIMATED_WAIT=long']],
-        'VERIFY_WRONG_DETAILS_SIMULTANEOUSLY': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', 'R:DATE=today'], ['R:DATE=tomorrow'], [], ['@positive']],
-        'SAYING_YES': [[], ['*R:FIRST_NAME=*', '@R:FIRST_NAME=Yaniv', 'H:BUSINESS_NEEDS_NAME=True']],
+        'VERIFY_WRONG_DETAILS_SIMULTANEOUSLY': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', 'R:DATE=today', '*R:FIRST_NAME=*', '*R:DATE=*'], ['R:DATE=tomorrow'], [], ['@positive']],
     }
 
     for test_name, test in tests.items():
