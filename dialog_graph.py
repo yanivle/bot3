@@ -58,9 +58,8 @@ class Path(object):
 
 
 class DialogGraph(object):
-    def __init__(self, robot_utts, human_utts, initial_state):
+    def __init__(self, robot_utts, initial_state):
         self.robot_utts = robot_utts
-        self.human_utts = human_utts
         self.start_vertex = Vertex(initial_state, True)
 
     def neighbors(self, vertex):
@@ -132,9 +131,9 @@ def getActiveGoal(state, goals):
             return goal
 
 
-def getNextUtt(state, robot_utts, human_utts, goals) -> Utt:
+def getNextUtt(state, robot_utts, goals) -> Utt:
     # print('Start state:', state)
-    dg = DialogGraph(robot_utts, human_utts, state)
+    dg = DialogGraph(robot_utts, state)
     goal = getActiveGoal(state, goals)
     if goal.satisfiedByState(state):
         print(f'{colors.C("*** ALL DONE***", colors.HEADER)}')

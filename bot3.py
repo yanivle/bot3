@@ -8,6 +8,7 @@ import diff as diff_module
 from diff import DiffType
 import event_log
 import dialog_graph
+import bot_driver
 
 bot_module_base = 'modules/rr'
 # bot_module_base = 'modules/haggler'
@@ -75,38 +76,22 @@ def runTests(state):
     for test_name, test in tests.items():
         print(f'Test: {colors.C(test_name, colors.FAIL)}')
         state = initial_state.clone()
-        state_history = [state]
+        driver = bot_driver.BotDriver(initial_state, robot_utts, goals)
         while test:
             human_utt = getHumanUttFromTest(test)
-
-            state = human_utt.applyToState(state)
-            state_history.append(state)
-            # print(colors.C(human_utt.text, colors.OKBLUE))
-            # print(state)
-
-            possible_robot_utts = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
-            robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
-            print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
-            for alternative in set(alternatives) - {robot_utt}:
-                print(f'  Alt: {alternative.text}')
-            state = robot_utt.applyToState(state)
+            # bot_driver.BotDriver.printUtt(human_utt)
+            driver.handle(human_utt)
 
 
 def interactiveMode(state):
+    driver = bot_driver.BotDriver(initial_state, robot_utts, goals)
+
     while True:
         human_utt = getHumanUttFreeform()
-
-        state = human_utt.applyToState(state)
         print(colors.C(human_utt.text, colors.OKBLUE))
-        # print(state)
 
-        possible_robot_utts = dialog_graph.getNextUtt(state, robot_utts, human_utts, goals)
-        robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
-        print(colors.C(f'{robot_utt.text}', colors.OKGREEN))
-        for alternative in set(alternatives) - {robot_utt}:
-            print(f'  Alt: {alternative.text}')
-        state = robot_utt.applyToState(state)
-        # print(state)
+        bot_driver.BotDriver.printUtt(human_utt)
+        driver.handle(human_utt)
 
 
 runTests(initial_state)
