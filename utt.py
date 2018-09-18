@@ -13,6 +13,7 @@ class Utt(object):
     # TODO: for now, requirements are just a StatementList.
     requirements: statement.GoalStatementList
     positive: bool
+    sorry: bool
 
     @staticmethod
     def fromText(txt_block):
@@ -21,12 +22,15 @@ class Utt(object):
         positive = '@positive' in lines
         if positive:
             lines.remove('@positive')
+        sorry = '@sorry' in lines
+        if sorry:
+            lines.remove('@sorry')
         REQUIREMENTS_PREFIX = 'REQ'
         requirements_lines = peel_lines(REQUIREMENTS_PREFIX, lines)
         state_lines = [line for line in lines if not line.startswith(REQUIREMENTS_PREFIX)]
         requirements = statement.GoalStatementList.fromText('\n'.join(requirements_lines))
         state = state_module.State.fromText('\n'.join(state_lines))
-        return Utt(text, state, requirements, positive)
+        return Utt(text, state, requirements, positive, sorry)
 
     def applyToState(self, state):
         state = state.clone()

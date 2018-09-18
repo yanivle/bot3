@@ -75,10 +75,12 @@ def runTests(state):
     for test_name, test in tests.items():
         print(f'Test: {colors.C(test_name, colors.FAIL)}')
         state = initial_state.clone()
+        state_history = [state]
         while test:
             human_utt = getHumanUttFromTest(test)
 
             state = human_utt.applyToState(state)
+            state_history.append(state)
             # print(colors.C(human_utt.text, colors.OKBLUE))
             # print(state)
 
@@ -105,15 +107,6 @@ def interactiveMode(state):
             print(f'  Alt: {alternative.text}')
         state = robot_utt.applyToState(state)
         # print(state)
-
-        # diff_to_goal = diff_module.diffFromStateToGoal(state, goal)
-        # print(f'Diff towards goal "{colors.C(goal.name, colors.HEADER)}":')
-        # if diff_to_goal.contradicted:
-        #     print(f'  contradicted: {diff_to_goal.contradicted}')
-        # if diff_to_goal.satisfied:
-        #     print(f'  satisfied: {diff_to_goal.satisfied}')
-        # if diff_to_goal.remaining:
-        #     print(f'  remaining: {diff_to_goal.remaining}')
 
 
 runTests(initial_state)
