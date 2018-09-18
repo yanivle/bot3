@@ -30,7 +30,6 @@ class BotDriver(object):
             self.rewindState(1)
         else:
             self.applyUttToState(human_utt)
-        print ('State: ', self.state)
         possible_robot_utts = dialog_graph.getNextUtt(self.state, self.robot_utts, self.goals)
         robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
         BotDriver.printUtt(robot_utt, alternatives)
