@@ -1,21 +1,19 @@
+Limitations:
+- Language is ugly for VerifyX(y) (becomes X=y + *X=correct_y)
+- VerifyX with correct value should lower the probability for that value (it doesn't now, so the bot will not reenforce it)
+- Need to clean up the goal stack
+
 Add support for proper debugging (allowing to specify the robot/human intent at any point).
 Fix tests (so they remember the replies and say "PASS" "FAIL" instead of having to re-read).
-
 Solve the randomness between candidates, if it's there (e.g. by sorting).
-
 Think about where to have values of R: variables (currently they are in the goal, think about this).
 
 Add support for rendering logic
-
 Simple support for sorry - revert to the previous state (without predictions) and try to find an intent that recreates the diff as well as possible
-
 How to support variable dependencies?
-
 Probs - try simple support? Ie true if > 0.75
 
-
 ----
-
 
 Translation from BG Duplex
 1. AskForX
@@ -34,28 +32,8 @@ AVAILABILITY[TIME=t]
 - possible solution: everytime I do *A=B also do A=?
 - also: if state has A=B, and adding A=C, instead set A=? (note that this depends on #1 above - do that first)
 
-3.add support for sorry/repeats
-
-
-
-
 
 -----
-
-Change response_logic to always prefer the single best goal (in the future this can be a list with ties).
-Each intent gets:
-statements (changes to the list)
-statements (add temporary goals to the other side)
-requirements (set of conditions on the state that allow saying the utt)
-
-Overall state of the infra is:
-robot_intents
-
----
-
-
-
----
 
 Use proper parsers (I started something in line_parser).
 
@@ -83,12 +61,6 @@ R:AVAILABILITY[TIME=7pm]=True
 R:AVAILABILITY[TIME=7:30pm]=True
 R:AVAILABILITY[TIME=8pm]=True
 *AGREED_TIME=*
-
-
-
-Need some way to enforce order: we want to robot to query for AVAILABILITY[TIME=7pm]
-before it queries for AGREED_TIME[TIME=7pm].
-Option 1: Make the goal require both availability and agreed time.
 
 
 Refactor VarSpec to use standard block_parser?
@@ -131,17 +103,6 @@ Solution 2: (?)
 use probs
 R:Let's do 8pm then
 AGREED_TIME[TIME=8pm]=True +0.2
-
-
-Think about adding Interest in statement not just variable.
-So, e.g.
-Can you do 8pm?
-*AGREED_TIME=8
-Which would get us closer to AGREED_TIME=8 than *AGREED_TIME
-Another option would be to start actually doing a graph search.
-(but might need to add support for conditional expressions...)
-
-
 
 think about:
 R: For 7pm
