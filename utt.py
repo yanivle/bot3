@@ -19,12 +19,13 @@ class Utt(object):
     def fromText(txt_block):
         lines = txt_block.split('\n')
         text = lines.pop(0)
-        positive = '@positive' in lines
-        if positive:
-            lines.remove('@positive')
         sorry = '@sorry' in lines
         if sorry:
             lines.remove('@sorry')
+            assert not lines, 'For now, @sorry is not supported with other effects.'
+        positive = '@positive' in lines
+        if positive:
+            lines.remove('@positive')
         REQUIREMENTS_PREFIX = 'REQ'
         requirements_lines = peel_lines(REQUIREMENTS_PREFIX, lines)
         state_lines = [line for line in lines if not line.startswith(REQUIREMENTS_PREFIX)]

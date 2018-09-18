@@ -4,8 +4,6 @@ import utt
 import goal as goal_module
 import state as state_module
 import colors
-import diff as diff_module
-from diff import DiffType
 import event_log
 import dialog_graph
 import bot_driver
@@ -37,7 +35,6 @@ def getHumanUttFreeform():
         lines.append(line)
         line = input('>>> ')
     res = utt.Utt.fromText('\n'.join(lines))
-    print(res)
     return res
 
 
