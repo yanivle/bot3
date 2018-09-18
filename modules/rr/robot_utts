@@ -69,4 +69,12 @@ To make sure, you don't have availability at all between 7pm and 8pm?
 Yes
 @positive
 ---
+Could we walk in without a reservation?
+@H:WALKINGS_ACCEPTED=True
+---
+So you don't have anything between 7pm and 8pm?
+*H:AVAILABILITY[TIME=7pm]=False
+*H:AVAILABILITY[TIME=7:30pm]=False
+*H:AVAILABILITY[TIME=8pm]=False
+---
 Hmm...

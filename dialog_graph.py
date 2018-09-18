@@ -129,6 +129,7 @@ def getActiveGoal(state, goals):
         return new_goal
     for goal in goals:
         if goal.canBeTrueGivenState(state):
+            print('Goal:', goal.name)
             return goal
 
 
