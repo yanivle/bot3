@@ -14,7 +14,7 @@ class Vertex(object):
     robot_turn: bool
 
     def __repr__(self):
-        return f'({self.state}, robot_turn={robot_turn})'
+        return f'({self.state}, robot_turn={self.robot_turn})'
 
 
 @dataclass(frozen=True)
@@ -96,6 +96,7 @@ class DialogGraph(object):
             # print('Path:', path)
             # print(f'Visited {visited_count} nodes.')
             neighbors = self.neighbors(vertex)
+            # print(f'vertex: {vertex}')
             # print(f'{len(neighbors)} neighbors.')
             for neighbor in neighbors:
                 # print(f'neighbor: {neighbor}')
@@ -139,9 +140,6 @@ def getNextUtt(state, robot_utts, goals) -> Utt:
         print(f'{colors.C("*** ALL DONE***", colors.HEADER)}')
         return [robot_utts[-1]]
     # print(f'Advancing towards {colors.C(goal.name, colors.HEADER)}')
-    # TODO: think about the following 2 lines (is this the right place for this? should we do this at all?):
-    state.predictions = statement.StatementList()
-    state.positive_predictions = statement.StatementList()
     paths = dg.bfs(goal)
     # print(f'Found total of {len(paths)} paths to goal.')
     if paths:

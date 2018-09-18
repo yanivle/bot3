@@ -19,12 +19,13 @@ Probs - try simple support? Ie true if > 0.75
 
 Translation from BG Duplex
 1. AskForX
-*X=*
 X=?
+*X=Y (where Y is the correct value for X)
 Note: usually X would be R:X
 2. VerifyX(X=y)
-*X=*
+X=y
 @X=y
+*X=Y (where Y is the correct value for X)
 3. SuggestTime(time=t)
 AVAILABILITY[TIME=t]
 
