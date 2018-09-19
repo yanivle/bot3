@@ -82,17 +82,24 @@ class DialogGraph(object):
                 new_state.positive_predictions = statement.StatementList()
                 ev = EdgeAndVertex(Edge(None), Vertex(new_state, not vertex.robot_turn))
                 res.add(ev)
+            else:
+                ev = EdgeAndVertex(Edge(None), Vertex(vertex.state.clone(), not vertex.robot_turn))
+                res.add(ev)
         return res
 
     def bfs(self, goal, max_path_length=10):
         node_to_label = {}
         dot = graphviz.Digraph()
         def vertex_to_label(vertex):
+            if vertex.robot_turn:
+                header = f'R{len(self.neighbors(vertex))}\n'
+            else:
+                header = f'H{len(self.neighbors(vertex))}\n'
             statements = '\n'.join(repr(x) for x in vertex.state.statements.statements)
             preds = '\n'.join(repr(x) for x in vertex.state.allPredictionStatements())
             if not preds:
-                return statements
-            return statements + '\nPreds:\n' + preds
+                return header + statements
+            return header + statements + '\nPreds:\n' + preds
 
         def vertex_to_id(vertex):
             label = vertex_to_label(vertex)
@@ -100,10 +107,12 @@ class DialogGraph(object):
                 id = str(len(node_to_label))
                 node_to_label[label] = id
                 color = 'black'
+                if goal.falseGivenState(vertex.state):
+                    color = 'red'
                 if goal.satisfiedByState(vertex.state):
                     color = 'green'
                 if goal_statement.trueGivenStatementList(vertex.state.statements):
-                    color = 'red'
+                    color = 'blue'
                 dot.attr('node', color=color)
                 dot.node(id, label)
             else:
