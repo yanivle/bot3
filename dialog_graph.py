@@ -82,7 +82,7 @@ class DialogGraph(object):
                 res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=4):
+    def bfs(self, goal, max_path_length=6):
         goal_statement = goal.firstUnsatisfiedStatement(self.start_vertex.state.statements)
         assert goal_statement
         res = []
@@ -96,11 +96,11 @@ class DialogGraph(object):
             # print('Path:', path)
             # print(f'Visited {visited_count} nodes.')
             neighbors = self.neighbors(vertex)
-            # print(f'vertex: {vertex}')
-            # print(f'{len(neighbors)} neighbors.')
+            print(f'vertex: {vertex}')
+            print(f'{len(neighbors)} neighbors.')
             for neighbor in neighbors:
-                # print(f'neighbor: {neighbor}')
-                # print(neighbor.vertex.state)
+                print(f'neighbor: {neighbor}')
+                print(neighbor.vertex.state)
                 if path.visited(neighbor.vertex):
                     # print('Already visited')
                     continue
@@ -140,7 +140,6 @@ def getNextUtt(state, robot_utts, goals) -> Utt:
     if goal.satisfiedByState(state):
         print(f'{colors.C("*** ALL DONE***", colors.HEADER)}')
         return [robot_utts[-1]]
-    # print(f'Advancing towards {colors.C(goal.name, colors.HEADER)}')
     paths = dg.bfs(goal)
     # print(f'Found total of {len(paths)} paths to goal.')
     if paths:
