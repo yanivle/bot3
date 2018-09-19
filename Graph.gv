@@ -1,0 +1,4 @@
+graph {
+	"this is a test" -- "this is a target"
+	"this is a test" -- "this is a target too"
+}

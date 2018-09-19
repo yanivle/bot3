@@ -5,9 +5,11 @@ R:DATE=tomorrow
 R:PARTY_SIZE=5
 ---
 Do you need the name?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 @H:BUSINESS_NEEDS_NAME=True
 ---
 Do you need the phone?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 @H:BUSINESS_NEEDS_PHONE=True
 ---
 For tomorrow at 7pm

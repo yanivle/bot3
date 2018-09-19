@@ -6,6 +6,8 @@ from state import State
 import colors
 import goal as goal_module
 import statement
+import graphviz
+import time
 
 
 @dataclass(frozen=True)
@@ -82,7 +84,32 @@ class DialogGraph(object):
                 res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=6):
+    def bfs(self, goal, max_path_length=10):
+        node_to_label = {}
+        dot = graphviz.Digraph()
+        def vertex_to_label(vertex):
+            statements = '\n'.join(repr(x) for x in vertex.state.statements.statements)
+            preds = '\n'.join(repr(x) for x in vertex.state.allPredictionStatements())
+            if not preds:
+                return statements
+            return statements + '\nPreds:\n' + preds
+
+        def vertex_to_id(vertex):
+            label = vertex_to_label(vertex)
+            if label not in node_to_label:
+                id = str(len(node_to_label))
+                node_to_label[label] = id
+                color = 'black'
+                if goal.satisfiedByState(vertex.state):
+                    color = 'green'
+                if goal_statement.trueGivenStatementList(vertex.state.statements):
+                    color = 'red'
+                dot.attr('node', color=color)
+                dot.node(id, label)
+            else:
+                id = node_to_label[label]
+            return id
+
         goal_statement = goal.firstUnsatisfiedStatement(self.start_vertex.state.statements)
         assert goal_statement
         res = []
@@ -96,15 +123,17 @@ class DialogGraph(object):
             # print('Path:', path)
             # print(f'Visited {visited_count} nodes.')
             neighbors = self.neighbors(vertex)
-            print(f'vertex: {vertex}')
-            print(f'{len(neighbors)} neighbors.')
+            # print(f'vertex: {vertex}')
+            # print(f'{len(neighbors)} neighbors.')
             for neighbor in neighbors:
-                print(f'neighbor: {neighbor}')
-                print(neighbor.vertex.state)
+                dot.edge(vertex_to_id(vertex), vertex_to_id(neighbor.vertex), repr(neighbor.edge))
+                # print(f'neighbor: {neighbor}')
+                # print(neighbor.vertex.state)
                 if path.visited(neighbor.vertex):
                     # print('Already visited')
                     continue
-                elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
+                #elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
+                elif goal.satisfiedByState(neighbor.vertex.state):
                     # elif goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
@@ -118,6 +147,10 @@ class DialogGraph(object):
                         # print('Goal contradicted by state')
                 else:
                     pass
+        dot.attr(label=f'Goal: {goal.name}\nGoal statement: {repr(goal_statement)}')
+        dot.attr(labelloc='t')
+        dot.view(f'/tmp/botdot{time.time()}.gv')
+        # graph.view()
         return res
 
 

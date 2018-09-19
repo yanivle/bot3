@@ -1,0 +1,24 @@
+digraph {
+	0 [label="H:AVAILABILITY=True
+H:CREDIT_CARD_REQUIRED=False
+H:RESERVATIONS_ACCEPTED=True"]
+	node [shape=doublecircle]
+	1 [label="H:AVAILABILITY=True
+H:CREDIT_CARD_REQUIRED=False
+H:RESERVATIONS_ACCEPTED=True
+R:DATE=tomorrow
+R:PARTY_SIZE=5
+R:PREFERRED_TIME=7pm
+R:PURPOSE=BOOK_RESERVATION"]
+	node [shape=circle]
+	0 -> 1 [label="Hi! Can I book a table for 7pm tomorrow for 5 people?"]
+	0 -> 0 [label="Hmm..."]
+	2 [label="H:AVAILABILITY=True
+H:CREDIT_CARD_REQUIRED=False
+H:RESERVATIONS_ACCEPTED=True
+Preds:
+H:BUSINESS_NEEDS_NAME=True"]
+	0 -> 2 [label="Do you need the name?"]
+	label="Goal: RESERVATION_MADE_7PM
+Goal statement: R:PURPOSE=BOOK_RESERVATION"
+}

@@ -5,6 +5,7 @@ R:DATE=tomorrow
 R:PARTY_SIZE=5
 ---
 Do you need the name?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 @H:BUSINESS_NEEDS_NAME=True
 ---
 The first name is Yaniv
