@@ -87,7 +87,7 @@ class DialogGraph(object):
                 res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=10):
+    def bfs(self, goal, max_path_length=5):
         node_to_label = {}
         dot = graphviz.Digraph()
 
@@ -108,29 +108,30 @@ class DialogGraph(object):
         def vertex_to_id(vertex):
             label = vertex_to_label(vertex)
             if label not in node_to_label:
-                id = str(len(node_to_label))
-                node_to_label[label] = id
+                #id = str(len(node_to_label))
+                the_id = str(id(vertex))
+                node_to_label[label] = the_id
                 color = 'white'
                 if goal.falseGivenState(vertex.state):
                     color = 'red'
-                if goal.satisfiedByState(vertex.state):
+                elif goal.satisfiedByState(vertex.state):
                     color = 'green'
-                if goal_statement.trueGivenStatementList(vertex.state.statements):
+                elif goal_statement.trueGivenStatementList(vertex.state.statements):
                     color = 'deepskyblue'
                 dot.attr('node', fillcolor=color, style='filled')
-                dot.node(id, label)
+                dot.node(the_id, label)
             else:
-                id = node_to_label[label]
-            return id
+                the_id = node_to_label[label]
+            return the_id
 
         goal_statement = goal.firstUnsatisfiedStatement(self.start_vertex.state.statements)
         assert goal_statement
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
-        visited_count = 0
+        visited = set()
         while queue:
-            visited_count += 1
             (vertex, path) = queue.pop(0)
+            visited.add(vertex)
             if len(path) > max_path_length:
                 break
             # print('Path:', path)
@@ -139,14 +140,14 @@ class DialogGraph(object):
             # print(f'vertex: {vertex}')
             # print(f'{len(neighbors)} neighbors.')
             for neighbor in neighbors:
-                dot.edge(vertex_to_id(vertex), vertex_to_id(neighbor.vertex), repr(neighbor.edge))
                 # print(f'neighbor: {neighbor}')
                 # print(neighbor.vertex.state)
                 if path.visited(neighbor.vertex):
                     # print('Already visited')
                     continue
+                dot.edge(vertex_to_id(vertex), vertex_to_id(neighbor.vertex), repr(neighbor.edge))
                 # elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
-                elif goal.satisfiedByState(neighbor.vertex.state):
+                if goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
                     max_path_length = len(path)

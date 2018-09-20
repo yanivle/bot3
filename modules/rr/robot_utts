@@ -1,6 +1,7 @@
 Hi! Can I book a table for 7pm tomorrow for 5 people?
 R:PURPOSE=BOOK_RESERVATION
 R:PREFERRED_TIME=7pm
+TIME=7pm
 R:DATE=tomorrow
 R:PARTY_SIZE=5
 ---
@@ -12,71 +13,94 @@ Do you need the phone?
 REQ(R:PURPOSE=BOOK_RESERVATION)
 @H:BUSINESS_NEEDS_PHONE=True
 ---
-For tomorrow at 7pm
+It's for tomorrow at 7pm
+REQ(R:PURPOSE=BOOK_RESERVATION)
 R:DATE=tomorrow
 R:PREFERRED_TIME=7pm
+TIME=7pm
 ---
 It's for tomorrow
+REQ(R:PURPOSE=BOOK_RESERVATION)
 R:DATE=tomorrow
 ---
 It's for 7pm
+REQ(R:PURPOSE=BOOK_RESERVATION)
 R:PREFERRED_TIME=7pm
+TIME=7pm
 ---
 Can you do 7:30pm?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 @H:AVAILABILITY[TIME=7:30pm]=True
+TIME=7:30pm
 ---
 Can you do 8pm?
+REQ(R:PURPOSE=BOOK_RESERVATION)
+TIME=8pm
 @H:AVAILABILITY[TIME=8pm]=True
 ---
 I need a table for 5 people
+REQ(R:PURPOSE=BOOK_RESERVATION)
 R:PARTY_SIZE=5
 ---
 The number is 2125655611
 R:PHONE_NUMBER=2125655611
+REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(H:BUSINESS_NEEDS_PHONE=True)
 ---
 The last name is Leviathan
 R:LAST_NAME=Leviathan
+REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(H:BUSINESS_NEEDS_NAME=True)
 ---
 The first name is Yaniv
 R:FIRST_NAME=Yaniv
+REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(H:BUSINESS_NEEDS_NAME=True)
 ---
 So am I all set?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(R:PARTY_SIZE=5)
 REQ(R:DATE=tomorrow)
 REQ(R:PREFERRED_TIME=7pm)
 REQ(GROUP(R:FIRST_NAME=Yaniv, R:LAST_NAME=Leviathan, R:PHONE_NUMBER=2125655611))
-@AGREED_TIME=*
+@AGREED_TIME=$TIME
 ---
 So am I all set for tomorrow at 7pm?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 R:DATE=tomorrow
 REQ(R:PARTY_SIZE=5)
 REQ(R:DATE=tomorrow)
 REQ(R:PREFERRED_TIME=7pm)
 REQ(GROUP(R:FIRST_NAME=Yaniv, R:LAST_NAME=Leviathan, R:PHONE_NUMBER=2125655611))
+REQ(TIME=7pm)
 @AGREED_TIME=7pm
 ---
 So am I all set for 7:30pm?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(R:PARTY_SIZE=5)
 REQ(R:DATE=tomorrow)
 REQ(R:PREFERRED_TIME=7pm)
 REQ(H:AVAILABILITY[TIME=7:30pm]=True)
 REQ(GROUP(R:FIRST_NAME=Yaniv, R:LAST_NAME=Leviathan, R:PHONE_NUMBER=2125655611))
+REQ(TIME=7:30pm)
 @AGREED_TIME=7:30pm
 ---
 So am I all set for 8pm?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(R:PARTY_SIZE=5)
 REQ(R:DATE=tomorrow)
 REQ(R:PREFERRED_TIME=7pm)
 REQ(AVAILABILITY[TIME=8pm]=True)
+REQ(TIME=8pm)
 @AGREED_TIME=8pm
 ---
 How long would the wait be?
+REQ(R:PURPOSE=BOOK_RESERVATION)
+REQ(TIME=*)
 *H:ESTIMATED_WAIT=*
 ---
 To make sure, you don't have availability at all between 7pm and 8pm?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 @H:AVAILABILITY[TIME=7pm]=False
 @H:AVAILABILITY[TIME=7:30pm]=False
 @H:AVAILABILITY[TIME=8pm]=False
@@ -85,11 +109,7 @@ Yes
 @positive
 ---
 Could we walk in without a reservation?
+REQ(R:PURPOSE=BOOK_RESERVATION)
 @H:WALKINGS_ACCEPTED=True
----
-So you don't have anything between 7pm and 8pm?
-*H:AVAILABILITY[TIME=7pm]=False
-*H:AVAILABILITY[TIME=7:30pm]=False
-*H:AVAILABILITY[TIME=8pm]=False
 ---
 Hmm...

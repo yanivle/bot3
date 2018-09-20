@@ -3,6 +3,7 @@ from typing import Dict, List
 from enum import Enum
 import pprint
 from util import peel, parse_list
+import re
 
 
 @dataclass(frozen=True)
@@ -54,18 +55,31 @@ class Statement(object):
     def canBeTrueGivenStatement(self, other):
         return self.trueGivenStatement(other) or self.unknownGivenStatement(other) or self.fixableVar()
 
+    def doSubstitutions(self, statement_list):
+        if '$' not in self.var:
+            return self
+        placeholder_vars = re.findall(r'\$\w+', self.var)
+        concrete_var = self.var
+        for placeholder_var in placeholder_vars:
+            concrete_val = statement_list.value(placeholder_var)
+            concrete_val.replace('$' + placeholder_var, concrete_val)
+            return Statement(concrete_var, concrete_val)
+
     def falseGivenStatementList(self, statement_list):
-        return any(self.falseGivenStatement(s) for s in statement_list.statements)
+        with_substitutions = self.doSubstitutions(statement_list)
+        return any(with_substitutions.falseGivenStatement(s) for s in statement_list.statements)
 
     def trueGivenStatementList(self, statement_list):
-        if any(self.trueGivenStatement(s) for s in statement_list.statements):
+        with_substitutions = self.doSubstitutions(statement_list)
+        if any(with_substitutions.trueGivenStatement(s) for s in statement_list.statements):
             # This assert would catch an inconsistent statement_list (one statement makes this True and another False).
-            assert not self.falseGivenStatementList(statement_list)
+            assert not with_substitutions.falseGivenStatementList(statement_list)
             return True
         return False
 
     def canBeTrueGivenStatementList(self, statement_list):
-        return all(self.canBeTrueGivenStatement(s) for s in statement_list.statements)
+        with_substitutions = self.doSubstitutions(statement_list)
+        return all(with_substitutions.canBeTrueGivenStatement(s) for s in statement_list.statements)
 
 
 class GoalStatementType(Enum):

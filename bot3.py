@@ -10,7 +10,7 @@ import bot_driver
 
 bot_module_base = 'modules/rr'
 # bot_module_base = 'modules/haggler'
-robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts.dbg')
+robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
 human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
 goals = goal_module.parseGoalsSpec(bot_module_base + '/goal_spec')
 initial_state = state_module.State.fromFile(bot_module_base + '/initial_state')
