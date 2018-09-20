@@ -97,9 +97,9 @@ class DialogGraph(object):
                     res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=5):
+    def bfs(self, goal, max_path_length=5, plot=False, max_nodes_to_visit=100):
         node_to_label = {}
-        dot = graphviz.Digraph()
+        dot = graphviz.Digraph() if plot else None
 
         def vertex_to_label(vertex):
             header = f'{len(self.neighbors(vertex, goal))}<br/>'
@@ -131,18 +131,19 @@ class DialogGraph(object):
                 the_id = node_to_label[label]
             return the_id
 
-        goal_statement = goal.firstUnsatisfiedStatement(self.start_vertex.state.statements)
-        assert goal_statement
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
         visited = set()
         while queue:
             (vertex, path) = queue.pop(0)
+            goal_statement = goal.firstUnsatisfiedStatement(vertex.state.statements)
+            assert goal_statement
             visited.add(vertex)
+            if len(visited) > max_nodes_to_visit:
+                break
             if len(path) > max_path_length:
                 break
             # print('Path:', path)
-            # print(f'Visited {visited_count} nodes.')
             neighbors = self.neighbors(vertex, goal)
             # print(f'vertex: {vertex}')
             # print(f'{len(neighbors)} neighbors.')
@@ -152,7 +153,10 @@ class DialogGraph(object):
                 if path.visited(neighbor.vertex):
                     # print('Already visited')
                     continue
-                dot.edge(vertex_to_id(vertex), vertex_to_id(neighbor.vertex), repr(neighbor.edge))
+                if plot:
+                    dot.edge(vertex_to_id(vertex), vertex_to_id(neighbor.vertex), repr(neighbor.edge))
+                if neighbor.vertex in visited:
+                    continue
                 # elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
                 if goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
@@ -167,9 +171,11 @@ class DialogGraph(object):
                         # print('Goal contradicted by state')
                 else:
                     pass
-        dot.attr(label=f'Goal: {goal.name}\nGoal statement: {repr(goal_statement)}')
-        dot.attr(labelloc='t')
-        dot.view(f'/tmp/botdot{time.time()}.gv')
+        if plot:
+            initial_goal_statement = goal.firstUnsatisfiedStatement(self.start_vertex.state.statements)
+            dot.attr(label=f'Goal: {goal.name}\nGoal statement: {repr(initial_goal_statement)}')
+            dot.attr(labelloc='t')
+            dot.view(f'/tmp/botdot{time.time()}.gv')
         # graph.view()
         return res
 
@@ -193,7 +199,7 @@ def getNextUtt(state, robot_utts, goals) -> Utt:
     if goal.satisfiedByState(state):
         print(f'{colors.C("*** ALL DONE***", colors.HEADER)}')
         return [robot_utts[-1]]
-    paths = dg.bfs(goal)
+    paths = dg.bfs(goal, plot=False)
     # print(f'Found total of {len(paths)} paths to goal.')
     if paths:
         #print('Selected path:', paths[0])
