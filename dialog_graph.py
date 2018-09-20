@@ -87,7 +87,7 @@ class DialogGraph(object):
                 res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=10):
+    def bfs(self, goal, max_path_length=4):
         node_to_label = {}
         dot = graphviz.Digraph()
         def vertex_to_label(vertex):
@@ -141,8 +141,8 @@ class DialogGraph(object):
                 if path.visited(neighbor.vertex):
                     # print('Already visited')
                     continue
-                #elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
-                elif goal.satisfiedByState(neighbor.vertex.state):
+                elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
+                # elif goal.satisfiedByState(neighbor.vertex.state):
                     # elif goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
