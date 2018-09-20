@@ -35,8 +35,13 @@ class Statement(object):
             return True
         if self.var != other.var:  # Different vars.
             return None
+        if self.value == '?' or other.value == '?':
+            return None
+        # Note that '?' is before '*', as evaluate('?', '*') = None
+        if self.value == '*' or other.value == '*':
+            return True
         # Same vars, compatible values.
-        if self.value == other.value or (self.value == '*' and other.value != '?') or (other.value == '*' and self.value != '?'):
+        if self.value == other.value:
             return True
         return False  # Same vars, incompatible values.
 
