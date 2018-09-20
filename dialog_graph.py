@@ -97,7 +97,7 @@ class DialogGraph(object):
                     res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=5, plot=False, max_nodes_to_visit=100):
+    def bfs(self, goal, max_path_length=5, plot=False, max_nodes_to_visit=1000):
         node_to_label = {}
         dot = graphviz.Digraph() if plot else None
 
@@ -181,13 +181,16 @@ class DialogGraph(object):
 
 
 def getActiveGoal(state, goals):
-    # TODO: need to consider positive_predictions here?
-    if state.predictions:
-        new_goal = goal_module.Goal(
-            'Interest', statement.GoalStatementList.fromStatementList(state.predictions))
-        return new_goal
     for goal in goals:
         if goal.canBeTrueGivenState(state):
+            if state.predictions:
+                new_goal = goal.clone()
+                new_goal.name = 'INTEREST'
+                predictions = statement.GoalStatementList.fromStatementList(state.predictions)
+                positive_predictions = statement.GoalStatementList.fromStatementList(state.positive_predictions)
+                new_goal.statements.statements = predictions.statements + positive_predictions.statements + new_goal.statements.statements
+                print('Goal:', goal.name)
+                return new_goal
             print('Goal:', goal.name)
             return goal
 
