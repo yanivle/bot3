@@ -59,6 +59,16 @@ class Path(object):
         return f'Path({self.edges_and_vertices})'
 
 
+def isTrivial(utt, state):
+    for statement in utt.state.statements.statements:
+        if state.statements.value(statement.var) != statement.value:
+            return False
+    for prediction in utt.state.allPredictionStatements():
+        if state.statements.value(prediction.var) != prediction.value:
+            return False
+    return True
+
+
 class DialogGraph(object):
     def __init__(self, robot_utts, initial_state):
         self.robot_utts = robot_utts
@@ -69,6 +79,9 @@ class DialogGraph(object):
         if vertex.robot_turn:
             for utt in self.robot_utts:
                 if utt.requirementsMet(vertex.state):
+                    # Don't allow statements that only repeat stuff or make predictions that are already set.
+                    if isTrivial(utt, vertex.state):
+                        continue
                     new_state = utt.applyToState(vertex.state)
                     ev = EdgeAndVertex(Edge(utt), Vertex(new_state, not vertex.robot_turn))
                     res.add(ev)
@@ -87,7 +100,7 @@ class DialogGraph(object):
                 res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=5):
+    def bfs(self, goal, max_path_length=7):
         node_to_label = {}
         dot = graphviz.Digraph()
 
