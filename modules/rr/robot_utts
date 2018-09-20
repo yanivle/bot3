@@ -63,6 +63,7 @@ REQ(R:PARTY_SIZE=5)
 REQ(R:DATE=tomorrow)
 REQ(R:PREFERRED_TIME=7pm)
 REQ(GROUP(R:FIRST_NAME=Yaniv, R:LAST_NAME=Leviathan, R:PHONE_NUMBER=2125655611))
+REQ(TIME=*)
 @AGREED_TIME=$TIME
 ---
 So am I all set for tomorrow at 7pm?
@@ -99,12 +100,12 @@ REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(TIME=*)
 *H:ESTIMATED_WAIT=*
 ---
-To make sure, you don't have availability at all between 7pm and 8pm?
-REQ(R:PURPOSE=BOOK_RESERVATION)
-@H:AVAILABILITY[TIME=7pm]=False
-@H:AVAILABILITY[TIME=7:30pm]=False
-@H:AVAILABILITY[TIME=8pm]=False
----
+#To make sure, you don't have availability at all between 7pm and 8pm?
+#REQ(R:PURPOSE=BOOK_RESERVATION)
+#@H:AVAILABILITY[TIME=7pm]=False
+#@H:AVAILABILITY[TIME=7:30pm]=False
+#@H:AVAILABILITY[TIME=8pm]=False
+#---
 Yes
 @positive
 ---

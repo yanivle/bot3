@@ -56,14 +56,16 @@ class Statement(object):
         return self.trueGivenStatement(other) or self.unknownGivenStatement(other) or self.fixableVar()
 
     def doSubstitutions(self, statement_list):
-        if '$' not in self.var:
-            return self
         placeholder_vars = re.findall(r'\$\w+', self.var)
-        concrete_var = self.var
+        var_with_substitutions = self.var
         for placeholder_var in placeholder_vars:
-            concrete_val = statement_list.value(placeholder_var)
-            concrete_val.replace('$' + placeholder_var, concrete_val)
-            return Statement(concrete_var, concrete_val)
+            concrete_var = statement_list.value(placeholder_var)
+            var_with_substitutions.replace('$' + placeholder_var, concrete_var)
+        if self.value.startswith('$'):
+            concrete_val = statement_list.value(self.value[1:])
+        else:
+            concrete_val = self.value
+        return Statement(var_with_substitutions, concrete_val)
 
     def falseGivenStatementList(self, statement_list):
         with_substitutions = self.doSubstitutions(statement_list)
@@ -187,6 +189,9 @@ class StatementList(object):
     @staticmethod
     def fromText(text):
         return StatementList(StatementList.listFromText(text))
+
+    def doSubstitutions(self, statement_list):
+        return StatementList([s.doSubstitutions(statement_list) for s in self.statements])
 
     def __bool__(self):
         return bool(self.statements)

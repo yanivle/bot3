@@ -13,10 +13,9 @@ import time
 @dataclass(frozen=True)
 class Vertex(object):
     state: State
-    robot_turn: bool
 
     def __repr__(self):
-        return f'({self.state}, robot_turn={self.robot_turn})'
+        return f'Vertex({self.state})'
 
 
 @dataclass(frozen=True)
@@ -59,6 +58,12 @@ class Path(object):
         return f'Path({self.edges_and_vertices})'
 
 
+def stateAfterHumanTurn(vertex):
+    res = vertex.state.clone()
+    for prediction in vertex.state.allPredictionStatements():
+        res.statements.update(prediction)
+    return res
+
 def isTrivial(utt, state):
     for statement in utt.state.statements.statements:
         if state.statements.value(statement.var) != statement.value:
@@ -72,43 +77,32 @@ def isTrivial(utt, state):
 class DialogGraph(object):
     def __init__(self, robot_utts, initial_state):
         self.robot_utts = robot_utts
-        self.start_vertex = Vertex(initial_state, True)
+        self.start_vertex = Vertex(initial_state)
 
-    def neighbors(self, vertex):
+    def neighbors(self, vertex, goal):
         res = set()
-        if vertex.robot_turn:
-            for utt in self.robot_utts:
-                if utt.requirementsMet(vertex.state):
-                    # Don't allow statements that only repeat stuff or make predictions that are already set.
-                    if isTrivial(utt, vertex.state):
-                        continue
-                    new_state = utt.applyToState(vertex.state)
-                    ev = EdgeAndVertex(Edge(utt), Vertex(new_state, not vertex.robot_turn))
+        state_after_human_turn = stateAfterHumanTurn(vertex)
+        if goal.satisfiedByState(state_after_human_turn):
+            return {EdgeAndVertex(Edge(None), Vertex(state_after_human_turn))}
+        if goal.falseGivenState(state_after_human_turn):
+            return {EdgeAndVertex(Edge(None), Vertex(state_after_human_turn))}
+        state_after_human_turn.predictions = statement.StatementList()
+        state_after_human_turn.positive_predictions = statement.StatementList()
+        for utt in self.robot_utts:
+            if utt.requirementsMet(state_after_human_turn):
+                # Don't allow statements that only repeat stuff or make predictions that are already set.
+                if not isTrivial(utt, state_after_human_turn):
+                    new_state = utt.applyToState(state_after_human_turn)
+                    ev = EdgeAndVertex(Edge(utt), Vertex(new_state))
                     res.add(ev)
-        # Human turn - apply predictions (for now applying all together - we might want to generate separate neighbors).
-        else:
-            if vertex.state.allPredictionStatements():
-                new_state = vertex.state.clone()
-                for prediction in vertex.state.allPredictionStatements():
-                    new_state.statements.update(prediction)
-                new_state.predictions = statement.StatementList()
-                new_state.positive_predictions = statement.StatementList()
-                ev = EdgeAndVertex(Edge(None), Vertex(new_state, not vertex.robot_turn))
-                res.add(ev)
-            else:
-                ev = EdgeAndVertex(Edge(None), Vertex(vertex.state.clone(), not vertex.robot_turn))
-                res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=7):
+    def bfs(self, goal, max_path_length=5):
         node_to_label = {}
         dot = graphviz.Digraph()
 
         def vertex_to_label(vertex):
-            if vertex.robot_turn:
-                header = f'R{len(self.neighbors(vertex))}<br/>'
-            else:
-                header = f'H{len(self.neighbors(vertex))}<br/>'
+            header = f'{len(self.neighbors(vertex, goal))}<br/>'
             statements = '<br/>'.join(repr(x) for x in vertex.state.statements.statements)
             preds = '<br/>'.join(repr(x) for x in vertex.state.allPredictionStatements())
             remaining = '<br/>'.join(repr(x) for x in goal.unsatisfiedStatements(vertex.state))
@@ -149,7 +143,7 @@ class DialogGraph(object):
                 break
             # print('Path:', path)
             # print(f'Visited {visited_count} nodes.')
-            neighbors = self.neighbors(vertex)
+            neighbors = self.neighbors(vertex, goal)
             # print(f'vertex: {vertex}')
             # print(f'{len(neighbors)} neighbors.')
             for neighbor in neighbors:
