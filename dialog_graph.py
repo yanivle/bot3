@@ -90,6 +90,7 @@ class DialogGraph(object):
     def bfs(self, goal, max_path_length=4):
         node_to_label = {}
         dot = graphviz.Digraph()
+
         def vertex_to_label(vertex):
             if vertex.robot_turn:
                 header = f'R{len(self.neighbors(vertex))}\n'
@@ -106,14 +107,14 @@ class DialogGraph(object):
             if label not in node_to_label:
                 id = str(len(node_to_label))
                 node_to_label[label] = id
-                color = 'black'
+                color = 'white'
                 if goal.falseGivenState(vertex.state):
                     color = 'red'
                 if goal.satisfiedByState(vertex.state):
                     color = 'green'
                 if goal_statement.trueGivenStatementList(vertex.state.statements):
-                    color = 'blue'
-                dot.attr('node', color=color)
+                    color = 'deepskyblue'
+                dot.attr('node', fillcolor=color, style='filled')
                 dot.node(id, label)
             else:
                 id = node_to_label[label]
@@ -142,7 +143,7 @@ class DialogGraph(object):
                     # print('Already visited')
                     continue
                 elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
-                # elif goal.satisfiedByState(neighbor.vertex.state):
+                    # elif goal.satisfiedByState(neighbor.vertex.state):
                     # elif goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
