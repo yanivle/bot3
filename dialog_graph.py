@@ -93,14 +93,17 @@ class DialogGraph(object):
 
         def vertex_to_label(vertex):
             if vertex.robot_turn:
-                header = f'R{len(self.neighbors(vertex))}\n'
+                header = f'R{len(self.neighbors(vertex))}<br/>'
             else:
-                header = f'H{len(self.neighbors(vertex))}\n'
-            statements = '\n'.join(repr(x) for x in vertex.state.statements.statements)
-            preds = '\n'.join(repr(x) for x in vertex.state.allPredictionStatements())
+                header = f'H{len(self.neighbors(vertex))}<br/>'
+            statements = '<br/>'.join(repr(x) for x in vertex.state.statements.statements)
+            preds = '<br/>'.join(repr(x) for x in vertex.state.allPredictionStatements())
+            remaining = '<br/>'.join(repr(x) for x in goal.unsatisfiedStatements(vertex.state))
+            if remaining:
+                remaining = f'<font color="red">{remaining}</font>'
             if not preds:
-                return header + statements
-            return header + statements + '\nPreds:\n' + preds
+                return '<' + header + statements + '<br/>Unsatisfied:<br/>' + remaining + '>'
+            return '<' + header + statements + '<br/>Preds:<br/>' + preds + '<br/>Unsatisfied:<br/>' + remaining + '>'
 
         def vertex_to_id(vertex):
             label = vertex_to_label(vertex)

@@ -23,6 +23,9 @@ class Goal(object):
     def satisfiedByState(self, state):
         return self.statements.trueGivenStatementList(state.statements)
 
+    def unsatisfiedStatements(self, state):
+        return self.statements.unsatisfiedStatements(state.statements)
+
     def canBeTrueGivenState(self, state):
         return self.statements.canBeTrueGivenStatementList(state.statements)
 

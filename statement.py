@@ -241,5 +241,8 @@ class GoalStatementList(StatementList):
     def canBeTrueGivenStatementList(self, statement_list):
         return all(s.canBeTrueGivenStatementList(statement_list) for s in self.statements)
 
+    def unsatisfiedStatements(self, statement_list):
+        return [s for s in self.statements if not s.trueGivenStatementList(statement_list)]
+
     def __hash__(self):
         return hash(self._key())
