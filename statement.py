@@ -122,6 +122,15 @@ class GoalStatement(object):
         assert (x for x in basics), f'An inner part of {text} couldn\'t be parsed.'
         return GoalStatement(basics, type)
 
+    def vars(self):
+        res = set()
+        for b in self.basics:
+            if isinstance(b, GoalStatement):
+                res |= b.vars()
+            else:
+                res.add(b.var)
+        return res
+
     @staticmethod
     def fromStatement(statement):
         return GoalStatement([statement], GoalStatementType.GROUP)
@@ -232,6 +241,9 @@ class StatementList(object):
         self.statements.append(statement)
         self.statements.sort()
 
+    def vars(self):
+        return set(s.var for s in self.statements)
+
 
 @dataclass
 class GoalStatementList(StatementList):
@@ -275,3 +287,6 @@ class GoalStatementList(StatementList):
 
     def __hash__(self):
         return hash(self._key())
+
+    def vars(self):
+        return set.union(*(s.vars() for s in self.statements))

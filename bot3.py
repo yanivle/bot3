@@ -18,6 +18,10 @@ initial_state = state_module.State.fromFile(bot_module_base + '/initial_state')
 for goal in goals:
     print(goal)
 
+all_vars = goal.statements.vars() | set.union(*((utt.state.statements.vars() | utt.state.predictions.vars()
+                                                 | utt.state.positive_predictions.vars()) for utt in robot_utts))
+print(sorted(all_vars))
+
 
 def getHumanUttFromTest(test):
     inp = test.pop(0)
