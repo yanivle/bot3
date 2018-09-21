@@ -80,6 +80,10 @@ def isTrivial(utt, state):
     for statement in utt.state.statements.statements + utt.state.allPredictionStatements():
         if state.statements.value(statement.var) != statement.value:
             return False
+    if utt.positive:
+        for statement in state.positive_predictions.statements:
+            if state.statements.value(statement.var) != statement.value:
+                return False
     return True
 
 
@@ -221,7 +225,7 @@ def getNextUtt(state, robot_utts, goals) -> Utt:
     goal_statement = goal.firstUnsatisfiedStatement(state.statements)
     assert goal_statement
     # print(goal_statement)
-    paths = dg.bfs(goal, goal_statement, plot=True)
+    paths = dg.bfs(goal, goal_statement, plot=False)
     # print(f'Found total of {len(paths)} paths to goal.')
     if paths:
         #print('Selected path:', paths[0])
