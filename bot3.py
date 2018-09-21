@@ -7,6 +7,7 @@ import colors
 import event_log
 import dialog_graph
 import bot_driver
+import statement
 
 bot_module_base = 'modules/rr'
 # bot_module_base = 'modules/haggler'
@@ -56,6 +57,19 @@ def getHumanUtt():
 # scoring_params = response_logic.ScoringParams(event_log.EventLog([]), config)
 
 
+def testLogic():
+    while True:
+        goal = goals[0]
+        print("Enter state:")
+        human_utt = getHumanUttFreeform()
+        state = state_module.State(human_utt.state.statements)
+        if goal.satisfiedByState(state):
+            print("Goal satisfied")
+        else:
+            print("Goal not satisfied - remaining:")
+            print('\n'.join(repr(s) for s in goal.unsatisfiedStatements(state)))
+
+
 def runTests(state):
     tests = {
         'BASIC': [[], [], ['@positive'], [], ['@positive']],
@@ -95,4 +109,5 @@ def interactiveMode(state):
 
 
 runTests(initial_state)
-interactiveMode(initial_state)
+# interactiveMode(initial_state)
+# testLogic()

@@ -12,6 +12,9 @@ class Statement(object):
     value: str
     p: float = 1.0
 
+    def __post_init__(self):
+        assert '(' not in self.var
+
     def __lt__(self, other):
         return self.var < other.var
 
@@ -60,6 +63,9 @@ class Statement(object):
     def canBeTrueGivenStatement(self, other):
         return self.trueGivenStatement(other) or self.unknownGivenStatement(other) or self.fixableVar()
 
+    def canBeFalseGivenStatement(self, other):
+        return self.falseGivenStatement(other) or self.unknownGivenStatement(other) or self.fixableVar()
+
     def doSubstitutions(self, statement_list):
         placeholder_vars = re.findall(r'\$\w+', self.var)
         placeholder_vars = [x[1:] for x in placeholder_vars]
@@ -90,11 +96,16 @@ class Statement(object):
         with_substitutions = self.doSubstitutions(statement_list)
         return all(with_substitutions.canBeTrueGivenStatement(s) for s in statement_list.statements)
 
+    def canBeFalseGivenStatementList(self, statement_list):
+        with_substitutions = self.doSubstitutions(statement_list)
+        return all(with_substitutions.canBeFalseGivenStatement(s) for s in statement_list.statements)
+
 
 class GoalStatementType(Enum):
     GROUP = 1
     OR = 2
     AND = 3
+    NOT = 4
 
 
 @dataclass(frozen=True)
@@ -113,12 +124,15 @@ class GoalStatement(object):
             inner_text = peel('AND', text)
             type = GoalStatementType.AND
         if not inner_text:
+            inner_text = peel('NOT', text)
+            type = GoalStatementType.NOT
+        if not inner_text:
             return GoalStatement([Statement.fromText(text)], GoalStatementType.GROUP)
-        inner_text_parts = parse_list(inner_text)
-        # BUG!!! Potentially big bug - not sorting to preserve the order from the goals file,
-        # but maybe this messes up some hashing or comparisons?
-        # basics = sorted([Statement.fromText(part) for part in inner_text_parts])
-        basics = [GoalStatement.fromText(part) for part in inner_text_parts]
+        if type == GoalStatementType.NOT:
+            basics = [GoalStatement.fromText(inner_text)]
+        else:
+            inner_text_parts = parse_list(inner_text)
+            basics = [GoalStatement.fromText(part) for part in inner_text_parts]
         assert (x for x in basics), f'An inner part of {text} couldn\'t be parsed.'
         return GoalStatement(basics, type)
 
@@ -142,7 +156,7 @@ class GoalStatement(object):
         return len(self.basics)
 
     def __repr__(self):
-        if len(self) == 1:
+        if len(self) == 1 and not self.type == GoalStatementType.NOT:
             return repr(self.basics[0])
         else:
             return f"{self.type.name}({', '.join(repr(s) for s in self.basics)})"
@@ -163,24 +177,42 @@ class GoalStatement(object):
             return any(basic.falseGivenStatementList(statement_list) for basic in self.basics) and not self.trueGivenStatementList(statement_list)
         elif self.type == GoalStatementType.AND:
             return any(basic.falseGivenStatementList(statement_list) for basic in self.basics)
+        elif self.type == GoalStatementType.NOT:
+            return self.basics[0].trueGivenStatementList(statement_list)
         raise RuntimeError()
 
     def trueGivenStatementList(self, statement_list):
         if self.type == GoalStatementType.GROUP:
             return any(basic.trueGivenStatementList(statement_list) for basic in self.basics) and not self.falseGivenStatementList(statement_list)
-        if self.type == GoalStatementType.OR:
+        elif self.type == GoalStatementType.OR:
             return any(basic.trueGivenStatementList(statement_list) for basic in self.basics)
-        if self.type == GoalStatementType.AND:
+        elif self.type == GoalStatementType.AND:
             return any(basic.trueGivenStatementList(statement_list) for basic in self.basics) and not self.falseGivenStatementList(statement_list)
+        elif self.type == GoalStatementType.NOT:
+            # BUG? Is this in consistent with the rest of the algebra?
+            return not self.basics[0].trueGivenStatementList(statement_list)
+        raise RuntimeError()
+
+    def canBeFalseGivenStatementList(self, statement_list):
+        if self.type == GoalStatementType.GROUP:
+            return any(basic.canBeFalseGivenStatementList(statement_list) for basic in self.basics)
+        elif self.type == GoalStatementType.OR:
+            return all(basic.canBeFalseGivenStatementList(statement_list) for basic in self.basics)
+        elif self.type == GoalStatementType.AND:
+            return any(basic.canBeFalseGivenStatementList(statement_list) for basic in self.basics)
+        elif self.type == GoalStatementType.NOT:
+            return self.basics[0].canBeTrueGivenStatementList(statement_list)
         raise RuntimeError()
 
     def canBeTrueGivenStatementList(self, statement_list):
         if self.type == GoalStatementType.GROUP:
             return all(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
-        if self.type == GoalStatementType.OR:
+        elif self.type == GoalStatementType.OR:
             return any(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
-        if self.type == GoalStatementType.AND:
+        elif self.type == GoalStatementType.AND:
             return all(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
+        elif self.type == GoalStatementType.NOT:
+            return self.basics[0].canBeFalseGivenStatementList(statement_list)
         raise RuntimeError()
 
 
@@ -284,6 +316,9 @@ class GoalStatementList(StatementList):
 
     def unsatisfiedStatements(self, statement_list):
         return [s for s in self.statements if not s.trueGivenStatementList(statement_list)]
+
+    def falseStatements(self, statement_list):
+        return [s for s in self.statements if s.falseGivenStatementList(statement_list)]
 
     def __hash__(self):
         return hash(self._key())

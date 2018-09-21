@@ -126,7 +126,8 @@ class DialogGraph(object):
             statements = makeHTMLList(vertex.state.statements.statements, 'State', 'black')
             preds = makeHTMLList(vertex.state.allPredictionStatements(), 'Preds', 'blue')
             remaining = makeHTMLList(goal.unsatisfiedStatements(vertex.state), 'Unsatisfied', 'red')
-            return '<' + header + statements + preds + remaining + '>'
+            false = makeHTMLList(goal.falseStatements(vertex.state), 'False', 'red2')
+            return '<' + header + statements + preds + remaining + false + '>'
 
         def vertex_to_id(vertex):
             label = vertex_to_label(vertex)
@@ -136,7 +137,7 @@ class DialogGraph(object):
                 node_to_label[label] = the_id
                 color = 'white'
                 if goal.falseGivenState(vertex.state):
-                    color = 'red'
+                    color = 'violet'
                 elif goal.satisfiedByState(vertex.state):
                     color = 'green'
                 elif goal_statement.trueGivenStatementList(vertex.state.statements):
