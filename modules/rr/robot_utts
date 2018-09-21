@@ -66,6 +66,14 @@ REQ(GROUP(R:FIRST_NAME=Yaniv, R:LAST_NAME=Leviathan, R:PHONE_NUMBER=2125655611))
 REQ(TIME=*)
 @AGREED_TIME=$TIME
 ---
+Ok let's do 7:30pm
+REQ(H:AVAILABILITY[TIME=7:30pm]=True)
+AGREED_TIME=7:30pm
+---
+Ok let's do 8pm
+REQ(H:AVAILABILITY[TIME=8pm]=True)
+AGREED_TIME=8pm
+---
 So am I all set for tomorrow at 7pm?
 REQ(R:PURPOSE=BOOK_RESERVATION)
 R:DATE=tomorrow
