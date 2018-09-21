@@ -111,9 +111,6 @@ REQ(TIME=*)
 Yes
 @positive
 ---
-Ok, I'll check and call you back later then.
-R:WILL_CHECK_AND_CALL_BACK_LATER=True
----
 Could we walk in without a reservation?
 REQ(R:PURPOSE=BOOK_RESERVATION)
 @H:WALKINGS_ACCEPTED=True

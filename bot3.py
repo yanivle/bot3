@@ -19,9 +19,45 @@ initial_state = state_module.State.fromFile(bot_module_base + '/initial_state')
 for goal in goals:
     print(goal)
 
-all_vars = goal.statements.vars() | set.union(*((utt.state.statements.vars() | utt.state.predictions.vars()
-                                                 | utt.state.positive_predictions.vars()) for utt in robot_utts))
-print(sorted(all_vars))
+all_vars = initial_state.statements.vars() | set.union(*(goal.statements.vars() for goal in goals)) | set.union(*((utt.state.statements.vars() | utt.state.predictions.vars()
+                                                                                                                   | utt.state.positive_predictions.vars()) for utt in robot_utts))
+R_vars_to_params = {}
+H_vars_to_params = {}
+neutral_vars_to_params = {}
+for var in all_vars:
+    if var.startswith('R:'):
+        s = R_vars_to_params
+    elif var.startswith('H:'):
+        s = H_vars_to_params
+    else:
+        s = neutral_vars_to_params
+    if '[' in var:
+        base = var.split('[')[0]
+        param = var.split('[')[1].split('=')[0]
+        if base not in s:
+            s[base] = set()
+        s[base].add(param)
+    else:
+        if var not in s:
+            s[var] = set()
+print('R-Arrtibutes:')
+for v, params in R_vars_to_params.items():
+    print(v)
+    if params:
+        print('  Params:', params)
+print()
+print('H-Arrtibutes:')
+for v, params in H_vars_to_params.items():
+    print(v)
+    if params:
+        print('  Params:', params)
+print()
+print('Neutral-Arrtibutes:')
+for v, params in neutral_vars_to_params.items():
+    print(v)
+    if params:
+        print('  Params:', params)
+print()
 
 
 def getHumanUttFromTest(test):
@@ -85,8 +121,8 @@ def runTests(state):
         'NO_AVAILABILITY_FOR_DAY': [[], ['H:AVAILABILITY[DATE=tomorrow]=False'], ['H:WALKINGS_ACCEPTED=True'], ['H:ESTIMATED_WAIT=unknown']],
         'AVAILABILITY_FOR_OTHER_TIMES': [[], ['H:AVAILABILITY[TIME=7:30pm]=True', 'H:AVAILABILITY[TIME=8pm]=True', 'H:AVAILABILITY[TIME=7pm]=False', '*AGREED_TIME=*', 'AGREED_TIME=?'], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], []],
         'AVAILABILITY_FOR_THIS_TIME': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['H:AVAILABILITY[TIME=$TIME]=True'], ['@positive'], ['AGREED_TIME=$TIME']],
-        'CC_REQUIRED': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=5]=True'], []],
-        'CC_REQUIRED_WRONG_PARTY_SIZE': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=6]=True', 'R:PARTY_SIZE=6'], []],
+        'CC_REQUIRED': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=5]=True']],
+        'CC_REQUIRED_WRONG_PARTY_SIZE': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=10]=True', 'R:PARTY_SIZE=10'], ['H:AVAILABILITY[PARTY_SIZE=5]=False', 'H:WALKINGS_ACCEPTED=True', 'H:ESTIMATED_WAIT=short']],
     }
 
     for test_name, test in tests.items():
