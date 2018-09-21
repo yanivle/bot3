@@ -112,9 +112,9 @@ def runTests(state):
         'ASK_FOR_DETAILS': [[], ['R:DATE=?', '*R:DATE=*'], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], [], ['@positive']],
         'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=John', '@R:FIRST_NAME=John', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['R:DATE=today', '@R:DATE=today', '*R:DATE=*'], [], ['@positive']],
         'NO_RESERVATIONS': [[], ['H:AVAILABILITY=False'], ['@positive'], ['H:ESTIMATED_WAIT=short']],
-        'NO_RESERVATIONS_FOR_7pm': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=7:30pm']],
-        'NO_RESERVATIONS_FOR_7pm_2': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['@positive', 'R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['AGREED_TIME=7:30pm']],
-        'NO_RESERVATIONS_FOR_7pm_AND_730pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['@positive'], ['@positive'], ['AGREED_TIME=8pm']],
+        'NO_RESERVATIONS_FOR_7pm': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['@positive'], ['H:AVAILABILITY[TIME=7:30pm]=True', 'TIME=7:30pm']],
+        'NO_RESERVATIONS_FOR_7pm_2': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['H:AVAILABILITY[TIME=7:30pm]=True', 'R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['AGREED_TIME=7:30pm']],
+        'NO_RESERVATIONS_FOR_7pm_AND_730pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['H:AVAILABILITY[TIME=8pm]=True'], ['@positive'], ['AGREED_TIME=8pm']],
         'NO_RESERVATIONS_FOR_7pm_AND_730pm_AND_8pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['H:AVAILABILITY[TIME=8pm]=False'], ['H:WALKINGS_ACCEPTED=True', 'H:ESTIMATED_WAIT=long']],
         'VERIFY_WRONG_DETAILS_SIMULTANEOUSLY': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', 'R:DATE=today', '*R:DATE=*', '*R:FIRST_NAME=*'], ['R:DATE=tomorrow'], [], ['@positive']],
         'SAYING_YES': [[], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', '@R:FIRST_NAME=Yaniv', 'H:BUSINESS_NEEDS_NAME=True'], ['AGREED_TIME=7pm']],
@@ -146,6 +146,6 @@ def interactiveMode(state):
         driver.handle(human_utt)
 
 
-runTests(initial_state)
-# interactiveMode(initial_state)
+#runTests(initial_state)
+interactiveMode(initial_state)
 # testLogic()

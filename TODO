@@ -1,4 +1,6 @@
 Support insistence with probs.
+Logic expansion
+Rendering logic
 
 ----
 
@@ -13,7 +15,7 @@ case 3 (interest with unknown)
 NAME=? *NAME=*          <--- these 2 always come together
 case 4 (interest with guess)
 "Is the name John?"
-NAME=? @NAME=John *NAME=*
+NAME=? *NAME=* @NAME=John
 
 consider renaming "X=? *X=*" to "Interest(X)" or "*X"
 

@@ -110,7 +110,7 @@ class DialogGraph(object):
             res.add(ev)
         return res
 
-    def bfs(self, goal, goal_statement, max_path_length=5, plot=False, max_nodes_to_visit=1000):
+    def bfs(self, goal, goal_statement, max_path_length=10, plot=False, max_nodes_to_visit=1000):
         node_to_label = {}
         dot = graphviz.Digraph() if plot else None
 
@@ -184,7 +184,7 @@ class DialogGraph(object):
                     # print('Goal contradicted by state')
                     continue
                 if goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
-                    # if goal.satisfiedByState(neighbor.vertex.state):
+                # if goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
                     max_path_length = len(path)
