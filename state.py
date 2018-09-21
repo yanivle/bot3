@@ -30,6 +30,9 @@ class State(object):
     def allPredictionStatements(self):
         return self.predictions.statements + self.positive_predictions.statements
 
+    def resetPredictions(self):
+        self.predictions = StatementList()
+
     @staticmethod
     def fromFile(filename):
         f = open(filename)

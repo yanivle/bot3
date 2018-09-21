@@ -13,9 +13,18 @@ import time
 @dataclass(frozen=True)
 class Vertex(object):
     state: State
+    robot_turn: bool
+
+    def turn(self):
+        if self.robot_turn:
+            return 'R'
+        return 'H'
 
     def __repr__(self):
-        return f'Vertex({self.state})'
+        if self.robot_turn:
+            return f'R - ({self.state})'
+        else:
+            return f'H - ({self.state})'
 
 
 @dataclass(frozen=True)
@@ -58,18 +67,18 @@ class Path(object):
         return f'Path({self.edges_and_vertices})'
 
 
-def stateAfterHumanTurn(vertex):
-    res = vertex.state.clone()
-    for prediction in vertex.state.allPredictionStatements():
+def simulateHumanTurn(state):
+    res = state.clone()
+    for prediction in state.allPredictionStatements():
         res.statements.update(prediction)
+    res.predictions = statement.StatementList()
+    res.positive_predictions = statement.StatementList()
     return res
 
+
 def isTrivial(utt, state):
-    for statement in utt.state.statements.statements:
+    for statement in utt.state.statements.statements + utt.state.allPredictionStatements():
         if state.statements.value(statement.var) != statement.value:
-            return False
-    for prediction in utt.state.allPredictionStatements():
-        if state.statements.value(prediction.var) != prediction.value:
             return False
     return True
 
@@ -77,40 +86,43 @@ def isTrivial(utt, state):
 class DialogGraph(object):
     def __init__(self, robot_utts, initial_state):
         self.robot_utts = robot_utts
-        self.start_vertex = Vertex(initial_state)
+        self.start_vertex = Vertex(initial_state, True)
 
     def neighbors(self, vertex, goal):
         res = set()
-        state_after_human_turn = stateAfterHumanTurn(vertex)
-        if goal.satisfiedByState(state_after_human_turn):
-            return {EdgeAndVertex(Edge(None), Vertex(state_after_human_turn))}
-        if goal.falseGivenState(state_after_human_turn):
-            return {EdgeAndVertex(Edge(None), Vertex(state_after_human_turn))}
-        state_after_human_turn.predictions = statement.StatementList()
-        state_after_human_turn.positive_predictions = statement.StatementList()
-        for utt in self.robot_utts:
-            if utt.requirementsMet(state_after_human_turn):
-                # Don't allow statements that only repeat stuff or make predictions that are already set.
-                if not isTrivial(utt, state_after_human_turn):
-                    new_state = utt.applyToState(state_after_human_turn)
-                    ev = EdgeAndVertex(Edge(utt), Vertex(new_state))
-                    res.add(ev)
+        if vertex.robot_turn:
+            # all predictions should have been cleared into the active goal.
+            assert not vertex.state.predictions, 'Have predictions after human turn.'
+            for utt in self.robot_utts:
+                if utt.requirementsMet(vertex.state):
+                    # Don't allow statements that only repeat stuff or make predictions that are already set.
+                    if not isTrivial(utt, vertex.state):
+                        new_state = utt.applyToState(vertex.state)
+                        ev = EdgeAndVertex(Edge(utt), Vertex(new_state, robot_turn=False))
+                        res.add(ev)
+        else:
+            new_state = simulateHumanTurn(vertex.state)
+            ev = EdgeAndVertex(Edge(None), Vertex(new_state, robot_turn=True))
+            res.add(ev)
         return res
 
-    def bfs(self, goal, max_path_length=5, plot=False, max_nodes_to_visit=1000):
+    def bfs(self, goal, goal_statement, max_path_length=5, plot=False, max_nodes_to_visit=1000):
         node_to_label = {}
         dot = graphviz.Digraph() if plot else None
 
+        def makeHTMLList(items, title, color):
+            res = '<br/>'.join(repr(x) for x in items)
+            if res:
+                res = f'<font color="{color}"><br/>{title}:<br/>{res}</font>'
+                return res
+            return ''
+
         def vertex_to_label(vertex):
-            header = f'{len(self.neighbors(vertex, goal))}<br/>'
-            statements = '<br/>'.join(repr(x) for x in vertex.state.statements.statements)
-            preds = '<br/>'.join(repr(x) for x in vertex.state.allPredictionStatements())
-            remaining = '<br/>'.join(repr(x) for x in goal.unsatisfiedStatements(vertex.state))
-            if remaining:
-                remaining = f'<font color="red">{remaining}</font>'
-            if not preds:
-                return '<' + header + statements + '<br/>Unsatisfied:<br/>' + remaining + '>'
-            return '<' + header + statements + '<br/>Preds:<br/>' + preds + '<br/>Unsatisfied:<br/>' + remaining + '>'
+            header = f'{vertex.turn()} ({len(self.neighbors(vertex, goal))})<br/>'
+            statements = makeHTMLList(vertex.state.statements.statements, 'State', 'black')
+            preds = makeHTMLList(vertex.state.allPredictionStatements(), 'Preds', 'blue')
+            remaining = makeHTMLList(goal.unsatisfiedStatements(vertex.state), 'Unsatisfied', 'red')
+            return '<' + header + statements + preds + remaining + '>'
 
         def vertex_to_id(vertex):
             label = vertex_to_label(vertex)
@@ -136,8 +148,6 @@ class DialogGraph(object):
         visited = set()
         while queue:
             (vertex, path) = queue.pop(0)
-            goal_statement = goal.firstUnsatisfiedStatement(vertex.state.statements)
-            assert goal_statement
             visited.add(vertex)
             if len(visited) > max_nodes_to_visit:
                 break
@@ -154,26 +164,25 @@ class DialogGraph(object):
                     # print('Already visited')
                     continue
                 if plot:
-                    dot.edge(vertex_to_id(vertex), vertex_to_id(neighbor.vertex), repr(neighbor.edge))
+                    dot.edge(vertex_to_id(vertex), vertex_to_id(
+                        neighbor.vertex), repr(neighbor.edge))
                 if neighbor.vertex in visited:
                     continue
-                # elif goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
-                if goal.satisfiedByState(neighbor.vertex.state):
+                if goal.falseGivenState(neighbor.vertex.state):
+                    # print('Goal contradicted by state')
+                    continue
+                if goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
+                    # if goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
                     max_path_length = len(path)
                 elif len(path) < max_path_length:
-                    if not goal.falseGivenState(neighbor.vertex.state):
-                        # print('Will explore.')
-                        queue.append((neighbor.vertex, path + neighbor))
-                    else:
-                        pass
-                        # print('Goal contradicted by state')
+                    # print('Will explore.')
+                    queue.append((neighbor.vertex, path + neighbor))
                 else:
                     pass
         if plot:
-            initial_goal_statement = goal.firstUnsatisfiedStatement(self.start_vertex.state.statements)
-            dot.attr(label=f'Goal: {goal.name}\nGoal statement: {repr(initial_goal_statement)}')
+            dot.attr(label=f'Goal: {goal.name}\nGoal statement: {repr(goal_statement)}')
             dot.attr(labelloc='t')
             dot.view(f'/tmp/botdot{time.time()}.gv')
         # graph.view()
@@ -185,24 +194,27 @@ def getActiveGoal(state, goals):
         if goal.canBeTrueGivenState(state):
             if state.predictions:
                 new_goal = goal.clone()
-                new_goal.name = 'INTEREST'
+                new_goal.name = 'INTEREST + ' + goal.name
                 predictions = statement.GoalStatementList.fromStatementList(state.predictions)
-                positive_predictions = statement.GoalStatementList.fromStatementList(state.positive_predictions)
-                new_goal.statements.statements = predictions.statements + positive_predictions.statements + new_goal.statements.statements
-                print('Goal:', goal.name)
+                new_goal.statements.statements = predictions.statements + new_goal.statements.statements
+                # print(new_goal)
                 return new_goal
-            print('Goal:', goal.name)
             return goal
 
 
 def getNextUtt(state, robot_utts, goals) -> Utt:
     # print('Start state:', state)
-    dg = DialogGraph(robot_utts, state)
     goal = getActiveGoal(state, goals)
+    print('Goal:', goal.name)
     if goal.satisfiedByState(state):
         print(f'{colors.C("*** ALL DONE***", colors.HEADER)}')
         return [robot_utts[-1]]
-    paths = dg.bfs(goal, plot=False)
+    state.resetPredictions()
+    dg = DialogGraph(robot_utts, state)
+    goal_statement = goal.firstUnsatisfiedStatement(state.statements)
+    assert goal_statement
+    # print(goal_statement)
+    paths = dg.bfs(goal, goal_statement, plot=False)
     # print(f'Found total of {len(paths)} paths to goal.')
     if paths:
         #print('Selected path:', paths[0])
