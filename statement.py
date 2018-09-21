@@ -62,10 +62,12 @@ class Statement(object):
 
     def doSubstitutions(self, statement_list):
         placeholder_vars = re.findall(r'\$\w+', self.var)
+        placeholder_vars = [x[1:] for x in placeholder_vars]
         var_with_substitutions = self.var
         for placeholder_var in placeholder_vars:
             concrete_var = statement_list.value(placeholder_var)
-            var_with_substitutions.replace('$' + placeholder_var, concrete_var)
+            var_with_substitutions = var_with_substitutions.replace(
+                '$' + placeholder_var, concrete_var)
         if self.value.startswith('$'):
             concrete_val = statement_list.value(self.value[1:])
         else:

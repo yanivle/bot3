@@ -108,12 +108,6 @@ REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(TIME=*)
 *H:ESTIMATED_WAIT=*
 ---
-#To make sure, you don't have availability at all between 7pm and 8pm?
-#REQ(R:PURPOSE=BOOK_RESERVATION)
-#@H:AVAILABILITY[TIME=7pm]=False
-#@H:AVAILABILITY[TIME=7:30pm]=False
-#@H:AVAILABILITY[TIME=8pm]=False
-#---
 Yes
 @positive
 ---

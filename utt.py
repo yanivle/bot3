@@ -41,7 +41,8 @@ class Utt(object):
             for statement in state.positive_predictions.statements:
                 state.statements.update(statement.doSubstitutions(state.statements))
         state.predictions = self.state.predictions.doSubstitutions(state.statements)
-        state.positive_predictions = self.state.positive_predictions.doSubstitutions(state.statements)
+        state.positive_predictions = self.state.positive_predictions.doSubstitutions(
+            state.statements)
         return state
 
     def requirementsMet(self, state):
