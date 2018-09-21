@@ -16,10 +16,6 @@ If stating something and not asking about it, we just set to the given value.
 
 ------
 
-Disallow robot to create predictions for things that are already true.
-Disallow robot to say statements that don't change the state (other than hmm).
-Remove the same edge appearing several times between the same nodes.
-
 Limitations:
 - Language is ugly for VerifyX(y) (becomes X=y + *X=correct_y)
 - VerifyX with correct value should lower the probability for that value (it doesn't now, so the bot will not reenforce it)
