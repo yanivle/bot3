@@ -256,6 +256,9 @@ class GoalStatementList(StatementList):
     def clone(self):
         return GoalStatementList([s.clone() for s in self.statements])
 
+    def countFalseGivenStatementList(self, statement_list):
+        return sum(1 for s in self.statements if s.falseGivenStatementList(statement_list))
+
     def falseGivenStatementList(self, statement_list):
         return any(s.falseGivenStatementList(statement_list) for s in self.statements)
 

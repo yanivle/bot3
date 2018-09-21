@@ -12,7 +12,7 @@ case 4 (interest with guess)
 NAME=? @NAME=John *NAME=*
 
 Basically, if asking about something we always set it to ?.
-If stating something and not asking about it, we just set to the correct value.
+If stating something and not asking about it, we just set to the given value.
 
 ------
 

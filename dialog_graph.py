@@ -143,6 +143,9 @@ class DialogGraph(object):
                 the_id = node_to_label[label]
             return the_id
 
+        initial_num_false_statements = goal.statements.countFalseGivenStatementList(
+            self.start_vertex.state.statements)
+
         res = []
         queue = [(self.start_vertex, Path.initFromVertex(self.start_vertex))]
         visited = set()
@@ -168,7 +171,11 @@ class DialogGraph(object):
                         neighbor.vertex), repr(neighbor.edge))
                 if neighbor.vertex in visited:
                     continue
-                if goal.falseGivenState(neighbor.vertex.state):
+                num_false = goal.statements.countFalseGivenStatementList(
+                    neighbor.vertex.state.statements)
+                # Don't allow utts that cause the goal to be false, unless they make things better.
+                if num_false and num_false >= initial_num_false_statements:
+                    # if goal.falseGivenState(neighbor.vertex.state):
                     # print('Goal contradicted by state')
                     continue
                 if goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
@@ -214,7 +221,7 @@ def getNextUtt(state, robot_utts, goals) -> Utt:
     goal_statement = goal.firstUnsatisfiedStatement(state.statements)
     assert goal_statement
     # print(goal_statement)
-    paths = dg.bfs(goal, goal_statement, plot=False)
+    paths = dg.bfs(goal, goal_statement, plot=True)
     # print(f'Found total of {len(paths)} paths to goal.')
     if paths:
         #print('Selected path:', paths[0])
