@@ -11,6 +11,17 @@ case 4 (interest with guess)
 "Is the name John?"
 NAME=? @NAME=John *NAME=*
 
+consider renaming "X=? *X=*" to "Interest(X)" or "*X"
+
+"What is X?"
+X=? *X=*
+"Is the value of X Y?"
+X=? *X=* @X=Y
+"X=Y, ok for how many people?"
+X=Y
+"I don't know X but I don't care about it, I need Z instead"
+X=? *Z=*
+
 Basically, if asking about something we always set it to ?.
 If stating something and not asking about it, we just set to the given value.
 
