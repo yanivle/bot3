@@ -24,7 +24,9 @@ class State(object):
             elif line.startswith('@'):
                 state.positive_predictions.update(Statement.fromText(line[1:]))
             else:
-                state.statements.update(Statement.fromText(line))
+                statement = Statement.fromText(line)
+                if statement:
+                    state.statements.update(statement)
         return state
 
     def allPredictionStatements(self):

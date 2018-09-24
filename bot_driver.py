@@ -2,15 +2,18 @@ import colors
 import dialog_graph
 from statement import StatementList
 
+
 class BotDriver(object):
-    def __init__(self, initial_state, robot_utts, goals):
+    def __init__(self, initial_state, robot_utts, goals, deducer):
         self.state = initial_state
         self.robot_utts = robot_utts
         self.goals = goals
         self.state_history = [initial_state]
+        self.deducer = deducer
 
     def applyUttToState(self, utt):
         self.state = utt.applyToState(self.state)
+        self.deducer.update(self.state)
         self.state_history.append(self.state)
 
     def rewindState(self, amount):
@@ -30,7 +33,8 @@ class BotDriver(object):
             self.rewindState(1)
         else:
             self.applyUttToState(human_utt)
-        possible_robot_utts = dialog_graph.getNextUtt(self.state, self.robot_utts, self.goals)
+        possible_robot_utts = dialog_graph.getNextUtt(
+            self.state, self.robot_utts, self.goals, self.deducer)
         robot_utt, alternatives = possible_robot_utts[0], possible_robot_utts[1:]
         BotDriver.printUtt(robot_utt, alternatives)
         self.applyUttToState(robot_utt)

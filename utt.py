@@ -36,10 +36,10 @@ class Utt(object):
     def applyToState(self, state):
         state = state.clone()
         for statement in self.state.statements.statements:
-            state.statements.update(statement.doSubstitutions(state.statements))
+            state.statements.update(statement)
         if self.positive:
             for statement in state.positive_predictions.statements:
-                state.statements.update(statement.doSubstitutions(state.statements))
+                state.statements.update(statement)
         state.predictions = self.state.predictions.doSubstitutions(state.statements)
         state.positive_predictions = self.state.positive_predictions.doSubstitutions(
             state.statements)

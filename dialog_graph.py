@@ -88,9 +88,10 @@ def isTrivial(utt, state):
 
 
 class DialogGraph(object):
-    def __init__(self, robot_utts, initial_state):
+    def __init__(self, robot_utts, initial_state, deducer):
         self.robot_utts = robot_utts
         self.start_vertex = Vertex(initial_state, True)
+        self.deducer = deducer
 
     def neighbors(self, vertex, goal):
         res = set()
@@ -102,6 +103,7 @@ class DialogGraph(object):
                     # Don't allow statements that only repeat stuff or make predictions that are already set.
                     if not isTrivial(utt, vertex.state):
                         new_state = utt.applyToState(vertex.state)
+                        self.deducer.update(new_state)
                         ev = EdgeAndVertex(Edge(utt), Vertex(new_state, robot_turn=False))
                         res.add(ev)
         else:
@@ -110,7 +112,7 @@ class DialogGraph(object):
             res.add(ev)
         return res
 
-    def bfs(self, goal, goal_statement, max_path_length=10, plot=False, max_nodes_to_visit=1000):
+    def bfs(self, goal, goal_statement, max_path_length=10, plot=False, max_nodes_to_visit=100):
         node_to_label = {}
         dot = graphviz.Digraph() if plot else None
 
@@ -184,7 +186,7 @@ class DialogGraph(object):
                     # print('Goal contradicted by state')
                     continue
                 if goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
-                # if goal.satisfiedByState(neighbor.vertex.state):
+                    # if goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
                     max_path_length = len(path)
@@ -214,7 +216,7 @@ def getActiveGoal(state, goals):
             return goal
 
 
-def getNextUtt(state, robot_utts, goals) -> Utt:
+def getNextUtt(state, robot_utts, goals, deducer) -> Utt:
     # print('Start state:', state)
     goal = getActiveGoal(state, goals)
     print('Goal:', goal.name)
@@ -222,7 +224,7 @@ def getNextUtt(state, robot_utts, goals) -> Utt:
         print(f'{colors.C("*** ALL DONE***", colors.HEADER)}')
         return [robot_utts[-1]]
     state.resetPredictions()
-    dg = DialogGraph(robot_utts, state)
+    dg = DialogGraph(robot_utts, state, deducer)
     goal_statement = goal.firstUnsatisfiedStatement(state.statements)
     assert goal_statement
     # print(goal_statement)

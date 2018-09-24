@@ -5,6 +5,7 @@ import statement
 import parse
 import itertools
 from util import peel
+import block_parser
 
 
 @dataclass
@@ -40,8 +41,10 @@ class Goal(object):
 
     @staticmethod
     def fromText(txt_block):
+        txt_block = block_parser.removeComments(txt_block)
         lines = txt_block.split('\n')
-        name = peel('GOAL', lines.pop(0))
+        name_line = lines.pop(0)
+        name = peel('GOAL', name_line)
         assert name
         statements = statement.GoalStatementList.fromText('\n'.join(lines))
         return Goal(name, statements)

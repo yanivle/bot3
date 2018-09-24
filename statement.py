@@ -269,6 +269,7 @@ class StatementList(object):
         self.statements = [s for s in self.statements if s.var != var]
 
     def update(self, statement):
+        statement = statement.doSubstitutions(self)
         self.removeVar(statement.var)
         self.statements.append(statement)
         self.statements.sort()

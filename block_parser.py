@@ -5,7 +5,7 @@ import parse
 
 def removeComments(txt):
     lines = txt.split('\n')
-    return '\n'.join(line for line in lines if not line or line[0] != '#')
+    return '\n'.join(line for line in lines if line and line[0] != '#')
 
 
 def removeEmptyLines(txt):
@@ -17,7 +17,12 @@ def parseBlockSpec(filename, blockParseFunction):
     txt = open(filename).read()
     txt = removeComments(txt)
     blocks = txt.split('---')
-    return [blockParseFunction(removeEmptyLines(block)) for block in blocks]
+    res = []
+    for block in blocks:
+        cleaned = removeComments(block)
+        if cleaned:
+            res.append(blockParseFunction(cleaned))
+    return res
 
 
 def createBlockSpecParser(blockParseFunction):

@@ -8,6 +8,7 @@ import event_log
 import dialog_graph
 import bot_driver
 import statement
+from deducer import Deducer
 
 bot_module_base = 'modules/rr'
 # bot_module_base = 'modules/haggler'
@@ -15,6 +16,7 @@ robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
 human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
 goals = goal_module.parseGoalsSpec(bot_module_base + '/goal_spec')
 initial_state = state_module.State.fromFile(bot_module_base + '/initial_state')
+deducer = Deducer(bot_module_base + '/deductions')
 
 for goal in goals:
     print(goal)
@@ -128,7 +130,7 @@ def runTests(state):
     for test_name, test in tests.items():
         print(f'Test: {colors.C(test_name, colors.FAIL)}')
         state = initial_state.clone()
-        driver = bot_driver.BotDriver(initial_state, robot_utts, goals)
+        driver = bot_driver.BotDriver(initial_state, robot_utts, goals, deducer)
         while test:
             human_utt = getHumanUttFromTest(test)
             # bot_driver.BotDriver.printUtt(human_utt)
@@ -136,7 +138,7 @@ def runTests(state):
 
 
 def interactiveMode(state):
-    driver = bot_driver.BotDriver(initial_state, robot_utts, goals)
+    driver = bot_driver.BotDriver(initial_state, robot_utts, goals, deducer)
 
     while True:
         human_utt = getHumanUttFreeform()
@@ -146,6 +148,6 @@ def interactiveMode(state):
         driver.handle(human_utt)
 
 
-#runTests(initial_state)
-interactiveMode(initial_state)
+runTests(initial_state)
+# interactiveMode(initial_state)
 # testLogic()
