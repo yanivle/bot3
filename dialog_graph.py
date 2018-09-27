@@ -229,7 +229,7 @@ def getNextUtt(state, robot_utts, goals, deducer) -> Utt:
     goal_statement = goal.firstUnsatisfiedStatement(state.statements)
     assert goal_statement
     # print(goal_statement)
-    paths = dg.bfs(goal, goal_statement, plot=False)
+    paths = dg.bfs(goal, goal_statement, plot=True)
     # print(f'Found total of {len(paths)} paths to goal.')
     if paths:
         #print('Selected path:', paths[0])

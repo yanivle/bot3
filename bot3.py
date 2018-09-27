@@ -127,11 +127,11 @@ def runTests(state):
         'AVAILABILITY_FOR_OTHER_TIMES': [[], ['H:AVAILABILITY[TIME=7:30pm]=True', 'H:AVAILABILITY[TIME=8pm]=True', 'H:AVAILABILITY[TIME=7pm]=False'], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], [], ['@positive']],
         'AVAILABILITY_FOR_THIS_TIME': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['H:AVAILABILITY[TIME=$TIME]=True'], ['@positive'], ['RESERVATION_CONFIRMED=True']],
         'CC_REQUIRED': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=5]=True']],
-        'CC_REQUIRED_WRONG_PARTY_SIZE': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=10]=True', 'R:PARTY_SIZE=10'], ['H:AVAILABILITY[PARTY_SIZE=5]=False', 'H:WALKINGS_ACCEPTED=True', 'H:ESTIMATED_WAIT=short']],
+        'CC_REQUIRED_WRONG_PARTY_SIZE': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=10]=True', 'R:PARTY_SIZE=10'], ['H:AVAILABILITY[PARTY_SIZE=5]=False', 'H:WALKINGS_ACCEPTED=True', 'H:ESTIMATED_WAIT=short'], ['H:AVAILABILITY[PARTY_SIZE=5;DATE=tomorrow]=False']],
     }
 
-    for test_name in tests:
-        # for test_name in ['AVAILABILITY_FOR_THIS_TIME']:
+    # for test_name in tests:
+    for test_name in ['CC_REQUIRED_WRONG_PARTY_SIZE']:
         test = tests[test_name]
         print(f'Test: {colors.C(test_name, colors.FAIL)}')
         state = initial_state.clone()

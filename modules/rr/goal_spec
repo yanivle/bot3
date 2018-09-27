@@ -42,7 +42,7 @@ R:DATE=tomorrow
 # Note that this needs to be 7pm, as this is the preferred time, not the agreed time.
 R:PREFERRED_TIME=7pm
 AND(H:AVAILABILITY[PARTY_SIZE=5;DATE=tomorrow;TIME=7pm]=False,H:AVAILABILITY[PARTY_SIZE=5;DATE=tomorrow;TIME=7:30pm]=False,H:AVAILABILITY[PARTY_SIZE=5;DATE=tomorrow;TIME=8pm]=False)
-H:WALKINGS_ACCEPTED=True
+OR(H:WALKINGS_ACCEPTED[PARTY_SIZE=5;DATE=tomorrow;TIME=7pm]=True,H:WALKINGS_ACCEPTED[PARTY_SIZE=5;DATE=tomorrow;TIME=7:30pm]=True,H:WALKINGS_ACCEPTED[PARTY_SIZE=5;DATE=tomorrow;TIME=8pm]=True)
 H:ESTIMATED_WAIT=*
 ---
 GOAL(NO_AVAILABILITY)
