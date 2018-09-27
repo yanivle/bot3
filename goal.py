@@ -12,9 +12,13 @@ import block_parser
 class Goal(object):
     name: str
     statements: statement.GoalStatementList
+    is_subgoal: bool
 
     def __repr__(self):
-        return f'Goal({self.name}): {self.statements}\n'
+        typ = 'Goal'
+        if self.is_subgoal:
+            typ = 'Subgoal'
+        return f'{typ}({self.name}): {self.statements}\n'
 
     def firstUnsatisfiedStatement(self, statement_list):
         for statement in self.statements.statements:
@@ -37,7 +41,7 @@ class Goal(object):
         return self.statements.falseGivenStatementList(state.statements)
 
     def clone(self):
-        return Goal(self.name, self.statements.clone())
+        return Goal(self.name, self.statements.clone(), self.is_subgoal)
 
     @staticmethod
     def fromText(txt_block):
@@ -45,9 +49,16 @@ class Goal(object):
         lines = txt_block.split('\n')
         name_line = lines.pop(0)
         name = peel('GOAL', name_line)
-        assert name
+        subgoal = False
+        if not name:
+            name = peel('SUBGOAL', name_line)
+            subgoal = True
+            assert name
         statements = statement.GoalStatementList.fromText('\n'.join(lines))
-        return Goal(name, statements)
+        res = Goal(name, statements, subgoal)
+        if subgoal:
+            statement.subgoals[name] = res
+        return res
 
 
 parseGoalsSpec = block_parser.createBlockSpecParser(Goal.fromText)

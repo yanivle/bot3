@@ -15,6 +15,7 @@ bot_module_base = 'modules/rr'
 robot_utts = utt.parseUttSpec(bot_module_base + '/robot_utts')
 human_utts = utt.parseUttSpec(bot_module_base + '/human_utts')
 goals = goal_module.parseGoalsSpec(bot_module_base + '/goal_spec')
+goals = [goal for goal in goals if not goal.is_subgoal]
 initial_state = state_module.State.fromFile(bot_module_base + '/initial_state')
 deducer = Deducer(bot_module_base + '/deductions')
 
@@ -112,7 +113,7 @@ def runTests(state):
     tests = {
         'BASIC': [[], [], ['@positive'], [], ['@positive']],
         'ASK_FOR_DETAILS': [[], ['R:DATE=?', '*R:DATE=*'], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], [], ['@positive']],
-        'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=John', '@R:FIRST_NAME=John', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['R:DATE=today', '@R:DATE=today', '*R:DATE=*'], [], ['@positive']],
+        'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=?', '@R:FIRST_NAME=John', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['R:DATE=?', '@R:DATE=today', '*R:DATE=*'], [], ['@positive']],
         'NO_RESERVATIONS': [[], ['H:AVAILABILITY=False'], ['@positive'], ['H:ESTIMATED_WAIT=short']],
         'NO_RESERVATIONS_FOR_7pm': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['@positive'], ['H:AVAILABILITY[TIME=7:30pm]=True', 'TIME=7:30pm']],
         'NO_RESERVATIONS_FOR_7pm_2': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['H:AVAILABILITY[TIME=7:30pm]=True', 'R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['AGREED_TIME=7:30pm']],
@@ -149,5 +150,5 @@ def interactiveMode(state):
 
 
 runTests(initial_state)
-# interactiveMode(initial_state)
+interactiveMode(initial_state)
 # testLogic()
