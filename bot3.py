@@ -22,8 +22,10 @@ deducer = Deducer(bot_module_base + '/deductions')
 for goal in goals:
     print(goal)
 
-all_vars = initial_state.statements.vars() | set.union(*(goal.statements.vars() for goal in goals)) | set.union(*((utt.state.statements.vars() | utt.state.predictions.vars()
-                                                                                                                   | utt.state.positive_predictions.vars()) for utt in robot_utts))
+all_vars = (initial_state.statements.vars() |
+            set.union(*(goal.statements.vars() for goal in goals)) |
+            set.union(*(utt.vars() for utt in robot_utts)) |
+            deducer.vars())
 R_vars_to_params = {}
 H_vars_to_params = {}
 neutral_vars_to_params = {}
@@ -114,21 +116,23 @@ def runTests(state):
         'BASIC': [[], [], ['@positive'], [], ['@positive']],
         'ASK_FOR_DETAILS': [[], ['R:DATE=?', '*R:DATE=*'], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], [], ['@positive']],
         'VERIFY_WRONG_DETAILS': [[], ['R:FIRST_NAME=?', '@R:FIRST_NAME=John', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['R:DATE=?', '@R:DATE=today', '*R:DATE=*'], [], ['@positive']],
-        'NO_RESERVATIONS': [[], ['H:AVAILABILITY=False'], ['@positive'], ['H:ESTIMATED_WAIT=short']],
-        'NO_RESERVATIONS_FOR_7pm': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['@positive'], ['H:AVAILABILITY[TIME=7:30pm]=True', 'TIME=7:30pm']],
-        'NO_RESERVATIONS_FOR_7pm_2': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['H:AVAILABILITY[TIME=7:30pm]=True', 'R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['AGREED_TIME=7:30pm']],
-        'NO_RESERVATIONS_FOR_7pm_AND_730pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['H:AVAILABILITY[TIME=8pm]=True'], ['@positive'], ['AGREED_TIME=8pm']],
+        'NO_RESERVATIONS': [[], ['H:AVAILABILITY=False'], ['H:AVAILABILITY[DATE=tomorrow]=False'], ['@positive'], ['H:ESTIMATED_WAIT=short']],
+        'NO_RESERVATIONS_FOR_7pm': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['@positive'], ['@positive'], ['RESERVATION_CONFIRMED=True']],
+        'NO_RESERVATIONS_FOR_7pm_2': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['H:AVAILABILITY[TIME=7:30pm]=True', 'R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], ['RESERVATION_CONFIRMED=True']],
+        'NO_RESERVATIONS_FOR_7pm_AND_730pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['H:AVAILABILITY[TIME=8pm]=True'], ['@positive'], [], ['@positive']],
         'NO_RESERVATIONS_FOR_7pm_AND_730pm_AND_8pm': [[], ['H:AVAILABILITY[TIME=7pm]=False', 'H:AVAILABILITY[TIME=7:30pm]=False'], ['H:AVAILABILITY[TIME=8pm]=False'], ['H:WALKINGS_ACCEPTED=True', 'H:ESTIMATED_WAIT=long']],
         'VERIFY_WRONG_DETAILS_SIMULTANEOUSLY': [[], ['R:FIRST_NAME=John', 'H:BUSINESS_NEEDS_NAME=True', 'R:DATE=today', '*R:DATE=*', '*R:FIRST_NAME=*'], ['R:DATE=tomorrow'], [], ['@positive']],
-        'SAYING_YES': [[], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', '@R:FIRST_NAME=Yaniv', 'H:BUSINESS_NEEDS_NAME=True'], ['AGREED_TIME=7pm']],
+        'SAYING_YES': [[], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', '@R:FIRST_NAME=Yaniv', 'H:BUSINESS_NEEDS_NAME=True'], ['RESERVATION_CONFIRMED=True']],
         'NO_AVAILABILITY_FOR_DAY': [[], ['H:AVAILABILITY[DATE=tomorrow]=False'], ['H:WALKINGS_ACCEPTED=True'], ['H:ESTIMATED_WAIT=unknown']],
-        'AVAILABILITY_FOR_OTHER_TIMES': [[], ['H:AVAILABILITY[TIME=7:30pm]=True', 'H:AVAILABILITY[TIME=8pm]=True', 'H:AVAILABILITY[TIME=7pm]=False', '*AGREED_TIME=*', 'AGREED_TIME=?'], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], []],
-        'AVAILABILITY_FOR_THIS_TIME': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['H:AVAILABILITY[TIME=$TIME]=True'], ['@positive'], ['AGREED_TIME=$TIME']],
+        'AVAILABILITY_FOR_OTHER_TIMES': [[], ['H:AVAILABILITY[TIME=7:30pm]=True', 'H:AVAILABILITY[TIME=8pm]=True', 'H:AVAILABILITY[TIME=7pm]=False'], ['R:FIRST_NAME=?', '*R:FIRST_NAME=*', 'H:BUSINESS_NEEDS_NAME=True'], [], ['@positive']],
+        'AVAILABILITY_FOR_THIS_TIME': [[], ['H:AVAILABILITY[TIME=7pm]=False'], ['H:AVAILABILITY[TIME=$TIME]=True'], ['@positive'], ['RESERVATION_CONFIRMED=True']],
         'CC_REQUIRED': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=5]=True']],
         'CC_REQUIRED_WRONG_PARTY_SIZE': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=10]=True', 'R:PARTY_SIZE=10'], ['H:AVAILABILITY[PARTY_SIZE=5]=False', 'H:WALKINGS_ACCEPTED=True', 'H:ESTIMATED_WAIT=short']],
     }
 
-    for test_name, test in tests.items():
+    for test_name in tests:
+        # for test_name in ['AVAILABILITY_FOR_THIS_TIME']:
+        test = tests[test_name]
         print(f'Test: {colors.C(test_name, colors.FAIL)}')
         state = initial_state.clone()
         driver = bot_driver.BotDriver(initial_state, robot_utts, goals, deducer)

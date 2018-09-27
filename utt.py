@@ -30,8 +30,9 @@ class Utt(object):
         requirements_lines = peel_lines(REQUIREMENTS_PREFIX, lines)
         state_lines = [line for line in lines if not line.startswith(REQUIREMENTS_PREFIX)]
         requirements = statement.GoalStatementList.fromText('\n'.join(requirements_lines))
-        state = state_module.State.fromText('\n'.join(state_lines))
-        return Utt(text, state, requirements, positive, sorry)
+        state = state_module.State.fromText('\n'.join(state_lines), do_substitutions=False)
+        utt = Utt(text, state, requirements, positive, sorry)
+        return utt
 
     def applyToState(self, state):
         state = state.clone()
@@ -44,6 +45,11 @@ class Utt(object):
         state.positive_predictions = self.state.positive_predictions.doSubstitutions(
             state.statements)
         return state
+
+    def vars(self):
+        return (self.state.statements.vars() |
+                self.state.predictions.vars() |
+                self.state.positive_predictions.vars())
 
     def requirementsMet(self, state):
         return self.requirements.trueGivenStatementList(state.statements)

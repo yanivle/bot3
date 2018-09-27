@@ -218,6 +218,7 @@ def getActiveGoal(state, goals):
 
 def getNextUtt(state, robot_utts, goals, deducer) -> Utt:
     # print('Start state:', state)
+
     goal = getActiveGoal(state, goals)
     print('Goal:', goal.name)
     if goal.satisfiedByState(state):

@@ -15,7 +15,7 @@ class Statement(object):
     p: float = 1.0
 
     def __post_init__(self):
-        assert '(' not in self.var
+        assert '(' not in self.var, self.var
 
     def __lt__(self, other):
         return self.var < other.var
@@ -69,18 +69,21 @@ class Statement(object):
         return self.falseGivenStatement(other) or self.unknownGivenStatement(other) or self.fixableVar()
 
     def doSubstitutions(self, statement_list):
-        placeholder_vars = re.findall(r'\$\w+', self.var)
+        placeholder_vars = re.findall(r'\$[0-9a-zA-Z_:]+', self.var)
         placeholder_vars = [x[1:] for x in placeholder_vars]
         var_with_substitutions = self.var
         for placeholder_var in placeholder_vars:
+            # print('replacing', placeholder_var, 'with', statement_list.value(placeholder_var))
             concrete_var = statement_list.value(placeholder_var)
+            # BUG: in case one var is a prefix of another.
             var_with_substitutions = var_with_substitutions.replace(
                 '$' + placeholder_var, concrete_var)
         if self.value.startswith('$'):
             concrete_val = statement_list.value(self.value[1:])
         else:
             concrete_val = self.value
-        return Statement(var_with_substitutions, concrete_val)
+        res = Statement(var_with_substitutions, concrete_val)
+        return res
 
     def falseGivenStatementList(self, statement_list):
         with_substitutions = self.doSubstitutions(statement_list)
@@ -108,6 +111,20 @@ class GoalStatementType(Enum):
     OR = 2
     AND = 3
     NOT = 4
+    TRUE = 5
+    FALSE = 6
+    UNKNOWN = 7
+
+    def unary(self):
+        return self in [GoalStatementType.NOT, GoalStatementType.TRUE, GoalStatementType.FALSE, GoalStatementType.UNKNOWN]
+
+    @staticmethod
+    def peelAndGetInnerText(text):
+        for type in GoalStatementType:
+            inner_text = peel(type.name, text)
+            if inner_text:
+                return inner_text, type, False
+        return text, GoalStatementType.GROUP, True
 
 
 @dataclass(frozen=True)
@@ -117,24 +134,14 @@ class GoalStatement(object):
 
     @staticmethod
     def fromText(text):
-        inner_text = peel('GROUP', text)
-        type = GoalStatementType.GROUP
-        if not inner_text:
-            inner_text = peel('OR', text)
-            type = GoalStatementType.OR
-        if not inner_text:
-            inner_text = peel('AND', text)
-            type = GoalStatementType.AND
-        if not inner_text:
-            inner_text = peel('NOT', text)
-            type = GoalStatementType.NOT
-        if not inner_text:
-            return GoalStatement([Statement.fromText(text)], GoalStatementType.GROUP)
-        if type == GoalStatementType.NOT:
-            basics = [GoalStatement.fromText(inner_text)]
-        else:
-            inner_text_parts = parse_list(inner_text)
-            basics = [GoalStatement.fromText(part) for part in inner_text_parts]
+        inner_text, type, leaf = GoalStatementType.peelAndGetInnerText(text)
+        if leaf:
+            return GoalStatement([Statement.fromText(inner_text)], type)
+        if type.unary():
+            basic = GoalStatement.fromText(inner_text)
+            return GoalStatement([basic], type)
+        inner_text_parts = parse_list(inner_text)
+        basics = [GoalStatement.fromText(part) for part in inner_text_parts]
         assert (x for x in basics), f'An inner part of {text} couldn\'t be parsed.'
         return GoalStatement(basics, type)
 
@@ -158,7 +165,7 @@ class GoalStatement(object):
         return len(self.basics)
 
     def __repr__(self):
-        if len(self) == 1 and not self.type == GoalStatementType.NOT:
+        if self.type == GoalStatementType.GROUP:
             return repr(self.basics[0])
         else:
             return f"{self.type.name}({', '.join(repr(s) for s in self.basics)})"
@@ -172,28 +179,52 @@ class GoalStatement(object):
     def __hash__(self):
         return hash(self._key())
 
-    def falseGivenStatementList(self, statement_list):
+    def basic(self):
+        if len(self) > 1:
+            raise RuntimeError()
+        return self.basics[0]
+
+    def evaluateGivenStatementList(self, statement_list):
         if self.type == GoalStatementType.GROUP:
-            return any(basic.falseGivenStatementList(statement_list) for basic in self.basics)
-        elif self.type == GoalStatementType.OR:
-            return any(basic.falseGivenStatementList(statement_list) for basic in self.basics) and not self.trueGivenStatementList(statement_list)
+            if any(basic.falseGivenStatementList(statement_list) for basic in self.basics):
+                return False
+            elif any(basic.trueGivenStatementList(statement_list) for basic in self.basics):
+                return True
+            return None
         elif self.type == GoalStatementType.AND:
-            return any(basic.falseGivenStatementList(statement_list) for basic in self.basics)
+            if any(basic.falseGivenStatementList(statement_list) for basic in self.basics):
+                return False
+            elif all(basic.trueGivenStatementList(statement_list) for basic in self.basics):
+                return True
+            return None
+        elif self.type == GoalStatementType.OR:
+            if any(basic.trueGivenStatementList(statement_list) for basic in self.basics):
+                return True
+            elif all(basic.falseGivenStatementList(statement_list) for basic in self.basics):
+                return False
+            return None
         elif self.type == GoalStatementType.NOT:
-            return self.basics[0].trueGivenStatementList(statement_list)
+            if self.basic().trueGivenStatementList(statement_list):
+                return False
+            elif self.basic().falseGivenStatementList(statement_list):
+                return True
+            return None
+        elif self.type == GoalStatementType.TRUE:
+            return self.basic().trueGivenStatementList(statement_list)
+        elif self.type == GoalStatementType.FALSE:
+            return self.basic().falseGivenStatementList(statement_list)
+        elif self.type == GoalStatementType.UNKNOWN:
+            return self.basic().unknownGivenStatementList(statement_list)
         raise RuntimeError()
 
+    def falseGivenStatementList(self, statement_list):
+        return self.evaluateGivenStatementList(statement_list) == False
+
     def trueGivenStatementList(self, statement_list):
-        if self.type == GoalStatementType.GROUP:
-            return any(basic.trueGivenStatementList(statement_list) for basic in self.basics) and not self.falseGivenStatementList(statement_list)
-        elif self.type == GoalStatementType.OR:
-            return any(basic.trueGivenStatementList(statement_list) for basic in self.basics)
-        elif self.type == GoalStatementType.AND:
-            return any(basic.trueGivenStatementList(statement_list) for basic in self.basics) and not self.falseGivenStatementList(statement_list)
-        elif self.type == GoalStatementType.NOT:
-            # BUG? Is this in consistent with the rest of the algebra?
-            return not self.basics[0].trueGivenStatementList(statement_list)
-        raise RuntimeError()
+        return self.evaluateGivenStatementList(statement_list) == True
+
+    def unknownGivenStatementList(self, statement_list):
+        return self.evaluateGivenStatementList(statement_list) == None
 
     def canBeFalseGivenStatementList(self, statement_list):
         if self.type == GoalStatementType.GROUP:
@@ -203,7 +234,11 @@ class GoalStatement(object):
         elif self.type == GoalStatementType.AND:
             return any(basic.canBeFalseGivenStatementList(statement_list) for basic in self.basics)
         elif self.type == GoalStatementType.NOT:
-            return self.basics[0].canBeTrueGivenStatementList(statement_list)
+            return self.basic().canBeTrueGivenStatementList(statement_list)
+        elif self.type == GoalStatementType.TRUE:
+            return self.basic().canBeFalseGivenStatementList(statement_list)
+        elif self.type == GoalStatementType.FALSE:
+            return self.basic().canBeTrueGivenStatementList(statement_list)
         raise RuntimeError()
 
     def canBeTrueGivenStatementList(self, statement_list):
@@ -214,7 +249,11 @@ class GoalStatement(object):
         elif self.type == GoalStatementType.AND:
             return all(basic.canBeTrueGivenStatementList(statement_list) for basic in self.basics)
         elif self.type == GoalStatementType.NOT:
-            return self.basics[0].canBeFalseGivenStatementList(statement_list)
+            return self.basic().canBeFalseGivenStatementList(statement_list)
+        elif self.type == GoalStatementType.TRUE:
+            return self.basic().canBeTrueGivenStatementList(statement_list)
+        elif self.type == GoalStatementType.FALSE:
+            return self.basic().canBeFalseGivenStatementList(statement_list)
         raise RuntimeError()
 
 
@@ -267,11 +306,18 @@ class StatementList(object):
     def __repr__(self):
         return f"({', '.join(repr(x) for x in self.statements)})"
 
+    # TODO: HACK - need to simply not keep variables with unknown value.
+    def cleanUnknowns(self):
+        for var in self.vars():
+            if self.value(var) == '?':
+                self.removeVar(var)
+
     def removeVar(self, var):
         self.statements = [s for s in self.statements if s.var != var]
 
-    def update(self, statement):
-        statement = statement.doSubstitutions(self)
+    def update(self, statement, do_substitutions: bool=True):
+        if do_substitutions:
+            statement = statement.doSubstitutions(self)
         self.removeVar(statement.var)
         self.statements.append(statement)
         self.statements.sort()
@@ -310,6 +356,9 @@ class Subgoal():
 
     def vars(self):
         return self.getGoalStatementList().vars()
+
+    def __hash__(self):
+        return hash(self.name)
 
 
 @dataclass

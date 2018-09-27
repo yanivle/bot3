@@ -14,6 +14,7 @@ class BotDriver(object):
     def applyUttToState(self, utt):
         self.state = utt.applyToState(self.state)
         self.deducer.update(self.state)
+        self.state.statements.cleanUnknowns()
         self.state_history.append(self.state)
 
     def rewindState(self, amount):

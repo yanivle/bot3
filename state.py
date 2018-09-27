@@ -14,19 +14,21 @@ class State(object):
     positive_predictions: StatementList = field(default_factory=StatementList)
 
     @staticmethod
-    def fromText(text):
+    def fromText(text, do_substitutions: bool=True):
         state = State()
         for line in text.split('\n'):
             if not line:
                 continue
             if line.startswith('*'):
-                state.predictions.update(Statement.fromText(line[1:]))
+                state.predictions.update(Statement.fromText(line[1:]), do_substitutions)
             elif line.startswith('@'):
-                state.positive_predictions.update(Statement.fromText(line[1:]))
+                state.positive_predictions.update(Statement.fromText(line[1:]), do_substitutions)
             else:
                 statement = Statement.fromText(line)
+                # TODO: uncomment this assert.
+                # assert statement
                 if statement:
-                    state.statements.update(statement)
+                    state.statements.update(statement, do_substitutions)
         return state
 
     def allPredictionStatements(self):
