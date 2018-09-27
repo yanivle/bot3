@@ -5,6 +5,8 @@ import pprint
 from util import peel, parse_list
 import re
 
+subgoals = {}
+
 
 @dataclass(frozen=True)
 class Statement(object):
@@ -58,7 +60,7 @@ class Statement(object):
         return self.evaluate(other) == None
 
     def fixableVar(self):
-        return self.var.startswith('R:')
+        return not self.var.startswith('H:')
 
     def canBeTrueGivenStatement(self, other):
         return self.trueGivenStatement(other) or self.unknownGivenStatement(other) or self.fixableVar()
@@ -279,6 +281,38 @@ class StatementList(object):
 
 
 @dataclass
+class Subgoal():
+    name: str
+
+    def clone(self):
+        return Subgoal(self.name)
+
+    def getGoalStatementList(self):
+        return subgoals[self.name].statements
+
+    def countFalseGivenStatementList(self, statement_list):
+        return self.getGoalStatementList().countFalseGivenStatementList(statement_list)
+
+    def falseGivenStatementList(self, statement_list):
+        return self.getGoalStatementList().falseGivenStatementList(statement_list)
+
+    def trueGivenStatementList(self, statement_list):
+        return self.getGoalStatementList().trueGivenStatementList(statement_list)
+
+    def canBeTrueGivenStatementList(self, statement_list):
+        return self.getGoalStatementList().canBeTrueGivenStatementList(statement_list)
+
+    def unsatisfiedStatements(self, statement_list):
+        return self.getGoalStatementList().unsatisfiedStatements(statement_list)
+
+    def falseStatements(self, statement_list):
+        return self.getGoalStatementList().falseStatements(statement_list)
+
+    def vars(self):
+        return self.getGoalStatementList().vars()
+
+
+@dataclass
 class GoalStatementList(StatementList):
     @staticmethod
     def listFromText(text):
@@ -286,7 +320,11 @@ class GoalStatementList(StatementList):
         for line in text.split('\n'):
             if not line:
                 continue
-            statements.append(GoalStatement.fromText(line))
+            subgoal = peel('->', line)
+            if subgoal:
+                statements.append(Subgoal(subgoal))
+            else:
+                statements.append(GoalStatement.fromText(line))
         return statements
 
     def __post_init__(self):
