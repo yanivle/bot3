@@ -130,7 +130,7 @@ def runTests(state):
         'CC_REQUIRED_WRONG_PARTY_SIZE': [[], ['H:CREDIT_CARD_REQUIRED[PARTY_SIZE=10]=True', 'R:PARTY_SIZE=10'], ['H:AVAILABILITY[PARTY_SIZE=5]=False', 'H:WALKINGS_ACCEPTED=True', 'H:ESTIMATED_WAIT=short'], ['H:AVAILABILITY[PARTY_SIZE=5;DATE=tomorrow]=False']],
     }
 
-    # for test_name in ['CC_REQUIRED_WRONG_PARTY_SIZE']:
+    # for test_name in ['AVAILABILITY_FOR_THIS_TIME']:
     for test_name in tests:
         test = tests[test_name]
         print(f'Test: {colors.C(test_name, colors.FAIL)}')

@@ -185,8 +185,8 @@ class DialogGraph(object):
                     # if goal.falseGivenState(neighbor.vertex.state):
                     # print('Goal contradicted by state')
                     continue
+                # if goal.satisfiedByState(neighbor.vertex.state):
                 if goal_statement.trueGivenStatementList(neighbor.vertex.state.statements):
-                    # if goal.satisfiedByState(neighbor.vertex.state):
                     # print('Satisfied!')
                     res.append(path + neighbor)
                     max_path_length = len(path)
