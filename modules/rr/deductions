@@ -24,12 +24,14 @@ H:CLOSING_TIME=7:30pm => H:AVAILABILITY[TIME=8pm]=False
 
 H:CLOSING_TIME=8pm => H:AVAILABILITY[TIME=8pm]=False
 
+1=1 => SHORT_EATING_TIME=False
+AND(H:CLOSING_TIME=8pm, TIME=7pm) => SHORT_EATING_TIME=True
+AND(H:CLOSING_TIME=8:30pm, TIME=7:30pm) => SHORT_EATING_TIME=True
+
 1=1 => TIME_IN_RANGE=False
 TIME=7pm => TIME_IN_RANGE=True
 TIME=7:30pm => TIME_IN_RANGE=True
 TIME=8pm => TIME_IN_RANGE=True
-
-#TODO: Add CLOSING_TIME...
 
 ###########################################
 # Below are BLIE level deductions

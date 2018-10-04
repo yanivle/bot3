@@ -143,6 +143,10 @@ REQ(R:PURPOSE=BOOK_RESERVATION)
 REQ(TIME=*)
 *H:ESTIMATED_WAIT=*
 ---
+Would 1 hour be enough to eat?
+REQ(R:PURPOSE=BOOK_RESERVATION)
+@H:SHORT_EATING_TIME_OK=True
+---
 Yes
 @positive
 ---
