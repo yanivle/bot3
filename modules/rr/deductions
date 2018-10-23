@@ -34,7 +34,7 @@ TIME=7:30pm => TIME_IN_RANGE=True
 TIME=8pm => TIME_IN_RANGE=True
 
 ###########################################
-# Below are BLIE level deductions
+# Below are TLIE level deductions
 ###########################################
 
 # UTT Level Deductions - i.e. the right side should *replace* the left side (right now implemented with a hack).
